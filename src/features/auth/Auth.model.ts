@@ -21,3 +21,12 @@ export interface ITherapistProfile {
   cvUrl?: string; // lien vers le CV stocké
   motivation: string;
 }
+export interface IOTP {
+  id?: number;
+  userId: string;
+  otp: string;
+  type: "activation" | "reset";
+  expiresAt: Date;
+  used?: boolean;
+  createdAt?: Date;
+}

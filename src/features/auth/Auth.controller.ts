@@ -137,6 +137,7 @@
 import { RegisterPatientService } from "./Auth.service";
 import { Request, Response } from "express";
 import { generateToken } from "../../shared/utils/jswtUtils";
+ 
 
 export class RegisterPatientController {
   // ----------------------------
@@ -239,6 +240,57 @@ export class RegisterPatientController {
     } catch (err: any) {
       if (err.message === "Utilisateur introuvable" || err.message === "Mot de passe incorrect") {
         return res.status(401).json({ error: err.message });
+      }
+      res.status(500).json({ error: "Erreur interne du serveur" });
+    }
+  }
+
+
+
+  static async requestOTP(req: Request, res: Response) {
+    try {
+      const { userId, type } = req.body;
+
+      if (!userId || !type) {
+        return res.status(400).json({ error: "Champs obligatoires manquants" });
+      }
+
+      if (type !== "activation" && type !== "reset") {
+        return res.status(400).json({ error: "Type OTP invalide" });
+      }
+
+      const result = await RegisterPatientService.sendOTP(userId, type);
+      res.status(200).json(result);
+
+    } catch (err: any) {
+      console.error(err);
+      res.status(500).json({ error: "Erreur interne du serveur" });
+    }
+  }
+
+  // ----------------------------
+  // Vérification OTP
+  // ----------------------------
+  static async verifyOTP(req: Request, res: Response) {
+    try {
+      const { userId, otp, type, newPassword } = req.body;
+
+      if (!userId || !otp || !type) {
+        return res.status(400).json({ error: "Champs obligatoires manquants" });
+      }
+
+      if (type !== "activation" && type !== "reset") {
+        return res.status(400).json({ error: "Type OTP invalide" });
+      }
+
+      const result = await RegisterPatientService.verifyOTP(userId, otp, type, newPassword);
+      res.status(200).json(result);
+
+    } catch (err: any) {
+      console.error(err);
+      // Cas OTP invalide ou expiré
+      if (err.message.includes("OTP invalide") || err.message.includes("Nouveau mot de passe requis")) {
+        return res.status(400).json({ error: err.message });
       }
       res.status(500).json({ error: "Erreur interne du serveur" });
     }

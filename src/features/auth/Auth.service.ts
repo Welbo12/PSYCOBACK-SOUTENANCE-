@@ -162,13 +162,14 @@
 //         return user;
 //     }
 
-
-
 // }
+
+
 import { AuthRepository } from "./Auth.repository";
 import { IUser } from "./Auth.model";
 import { comparePassword, hashPassword } from "../../shared/utils/hashUtils";
 import { cryptEmail, compareEmail } from "../../shared/utils/cryptUtils";
+import pool from "../../shared/database/client";
 
 export class RegisterPatientService {
     // ----------------------------
@@ -298,4 +299,44 @@ export class RegisterPatientService {
 
         return user;
     }
+
+    static generateOTP(length = 6) {
+    let otp = "";
+    for (let i = 0; i < length; i++) otp += Math.floor(Math.random() * 10);
+    return otp;
+  }
+
+  // ----------------------------
+  // Envoi OTP (activation ou reset)
+  // ----------------------------
+  static async sendOTP(userId: string, type: "activation" | "reset") {
+    const otp = this.generateOTP();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+    await AuthRepository.createOTP({ userId, otp, type, expiresAt });
+    // TODO: envoyer l'OTP par email
+    console.log(`OTP ${type} pour l'utilisateur ${userId}: ${otp}`);
+    return { message: `OTP ${type} envoyé` };
+  }
+
+  // ----------------------------
+  // Vérification OTP et action
+  // ----------------------------
+  static async verifyOTP(userId: string, otp: string, type: "activation" | "reset", newPassword?: string) {
+    const record = await AuthRepository.findValidOTP(userId, otp, type);
+    if (!record) throw new Error("OTP invalide ou expiré");
+
+    if (type === "activation") {
+      // Marquer utilisateur comme vérifié
+      await pool.query("UPDATE utilisateur SET verified = true WHERE id = $1", [userId]);
+    } else if (type === "reset") {
+      if (!newPassword) throw new Error("Nouveau mot de passe requis");
+      const hashedPassword = await hashPassword(newPassword);
+      await pool.query("UPDATE utilisateur SET motdepasse = $1 WHERE id = $2", [hashedPassword, userId]);
+    }
+
+    // Marquer OTP comme utilisé
+    await AuthRepository.markOTPUsed(record.id!);
+
+    return { message: type === "activation" ? "Compte vérifié" : "Mot de passe réinitialisé" };
+  }
 }
