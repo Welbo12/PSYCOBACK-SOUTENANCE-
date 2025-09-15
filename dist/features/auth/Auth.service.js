@@ -62,7 +62,9 @@ class RegisterPatientService {
                             console.log(`⏭️  Utilisateur ${u.pseudonyme} n'a pas d'email, ignoré`);
                             continue;
                         }
-                        const isEmailValid = yield (0, cryptUtils_1.compareEmail)(email, u.email);
+                        // Convertir le Buffer en chaîne si nécessaire
+                        const emailToCompare = Buffer.isBuffer(u.email) ? u.email.toString() : u.email;
+                        const isEmailValid = yield (0, cryptUtils_1.compareEmail)(email, emailToCompare);
                         if (isEmailValid) {
                             user = u;
                             console.log("✅ Utilisateur trouvé:", u.pseudonyme);
@@ -82,6 +84,16 @@ class RegisterPatientService {
                 // Vérifier le mot de passe
                 console.log("🔐 Vérification du mot de passe...");
                 // Vérifier que le mot de passe existe et est valide
+                console.log("🔍 Debug mot de passe:", {
+                    motDePasse: user.motDePasse,
+                    type: typeof user.motDePasse,
+                    length: user.motDePasse ? user.motDePasse.length : 'undefined',
+                    isNull: user.motDePasse === null,
+                    isUndefined: user.motDePasse === undefined,
+                    isEmpty: user.motDePasse === '',
+                    isStringNull: user.motDePasse === 'null',
+                    isStringUndefined: user.motDePasse === 'undefined'
+                });
                 if (!user.motDePasse ||
                     user.motDePasse.trim() === '' ||
                     user.motDePasse === 'null' ||
@@ -105,10 +117,10 @@ class RegisterPatientService {
             }
         });
     }
-    static loginByClearEmail(email, motDePasse) {
+    static loginByClearEmail(email_clair, motDePasse) {
         return __awaiter(this, void 0, void 0, function* () {
             // Rechercher l'utilisateur dans la base de données avec l'email en clair
-            const user = yield Auth_repository_1.AuthRepository.findByClearEmail(email);
+            const user = yield Auth_repository_1.AuthRepository.findByClearEmail(email_clair);
             if (!user) {
                 throw new Error("Utilisateur introuvable");
             }
@@ -117,6 +129,20 @@ class RegisterPatientService {
             if (!isPasswordValid) {
                 throw new Error("Mot de passe incorrect");
             }
+            return user;
+        });
+    }
+    static registerPsychologue(nom, prenom, motDePasse, email_clair, domaines, sujets, methodes, description, motivation, cvUrl) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Vérif si mail déjà utilisé (dans email_clair car c’est un psy)
+            const existing = yield Auth_repository_1.AuthRepository.findByMailClair(email_clair);
+            if (existing) {
+                throw new Error("Un utilisateur avec cet email existe déjà");
+            }
+            // Hash mot de passe
+            const hashedPassword = yield (0, hashUtils_1.hashPassword)(motDePasse);
+            // Création en BDD
+            const user = yield Auth_repository_1.AuthRepository.createPsychologue(nom, prenom, hashedPassword, email_clair, domaines, sujets, methodes, description, motivation, cvUrl);
             return user;
         });
     }

@@ -5,4 +5,6 @@ const Auth_controller_1 = require("./Auth.controller");
 const router = (0, express_1.Router)();
 router.post("/register/patient", Auth_controller_1.RegisterPatientController.registerPatient);
 router.post("/login", Auth_controller_1.RegisterPatientController.login);
+router.post("/loginByClearEmail", Auth_controller_1.RegisterPatientController.loginByClearEmail);
+router.post("/register/psychologue", Auth_controller_1.RegisterPatientController.registerPsychologue);
 exports.default = router;
