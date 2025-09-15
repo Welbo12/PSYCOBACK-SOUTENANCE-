@@ -44,7 +44,9 @@ export class RegisterPatientController {
             console.error(err);
 
             // Gestion des erreurs spécifiques
-            if (err.message === "Utilisateur introuvable" || err.message === "Mot de passe incorrect") {
+            if (err.message === "Utilisateur introuvable" || 
+                err.message === "Mot de passe incorrect" ||
+                err.message === "Compte utilisateur invalide - mot de passe manquant") {
                 return res.status(401).json({ error: err.message });
             }
 
@@ -75,7 +77,9 @@ export class RegisterPatientController {
             console.error(err);
 
             // Gestion des erreurs spécifiques
-            if (err.message === "Utilisateur introuvable" || err.message === "Mot de passe incorrect") {
+            if (err.message === "Utilisateur introuvable" || 
+                err.message === "Mot de passe incorrect" ||
+                err.message === "Compte utilisateur invalide - mot de passe manquant") {
                 return res.status(401).json({ error: err.message });
             }
 

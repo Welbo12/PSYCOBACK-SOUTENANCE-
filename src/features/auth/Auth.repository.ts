@@ -27,6 +27,21 @@ export class AuthRepository {
         return result.rows[0]; // Retourne uniquement la première ligne trouvée
     }
 
+    static async findAllUsers() {
+        const result = await pool.query(
+            `SELECT 
+                id,
+                pseudonyme,
+                motdepasse as "motDePasse",
+                email,
+                email_clair,
+                datecreation as "dateCreation",
+                role
+            FROM utilisateur`
+        );
+        return result.rows;
+    }
+
     // Hash déterministe pour l'email (SHA-256)
     static hashEmail(email: string): string {
         return crypto.createHash("sha256").update(email).digest("hex");
