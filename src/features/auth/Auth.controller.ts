@@ -273,7 +273,7 @@ export class RegisterPatientController {
   // ----------------------------
   static async verifyOTP(req: Request, res: Response) {
     try {
-      const { userId, otp, type, newPassword } = req.body;
+      const { userId, otp, type } = req.body;
 
       if (!userId || !otp || !type) {
         return res.status(400).json({ error: "Champs obligatoires manquants" });
@@ -283,7 +283,7 @@ export class RegisterPatientController {
         return res.status(400).json({ error: "Type OTP invalide" });
       }
 
-      const result = await RegisterPatientService.verifyOTP(userId, otp, type, newPassword);
+      const result = await RegisterPatientService.verifyOTP(userId, otp, type);
       res.status(200).json(result);
 
     } catch (err: any) {

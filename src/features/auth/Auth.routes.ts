@@ -7,6 +7,10 @@ const router = Router();
 router.post("/register/patient", RegisterPatientController.registerPatient);
 router.post("/login", RegisterPatientController.login);
 router.post("/loginByClearEmail", RegisterPatientController.loginByClearEmail);
+router.post("/request-otp", RegisterPatientController.requestOTP);
+
+// Vérification OTP
+router.post("/verify-otp", RegisterPatientController.verifyOTP);
 
 router.post(
   "/register/psychologue",

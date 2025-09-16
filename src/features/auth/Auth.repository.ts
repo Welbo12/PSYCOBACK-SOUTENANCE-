@@ -10,7 +10,7 @@ export class AuthRepository {
   // -----------------------------
   static async createPatient(
     pseudonyme: string,
-    motdepasse: string, // changer ici
+    motdepasse: string,
     email: string,
     role: string
   ) {
