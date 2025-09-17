@@ -1,5 +1,5 @@
 import pool from "../../shared/database/client";
-import { IJournal } from "../JournalIntime/Journal.model";
+import { IJournal } from "./Journal.model";
 
 export class JournalRepository {
   // Créer ou mettre à jour le journal d'un utilisateur (1 journal par utilisateur)

@@ -1,6 +1,6 @@
 // src/modules/journal/Journal.controller.ts
 import { Request, Response } from "express";
-import { JournalService } from "../JournalIntime/journal.service";
+import { JournalService } from "./Journal.service";
 
 export class JournalController {
   // ➕ Créer/MàJ le journal de l'utilisateur connecté

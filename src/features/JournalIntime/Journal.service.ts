@@ -1,5 +1,5 @@
-// src/modules/journal/Journal.service.ts
-import { JournalRepository } from "../JournalIntime/journal.repository";
+// src/modules/journal/Journal.service.tsrepository
+import { JournalRepository } from "./Journal.repository";
 import { IJournal } from "./Journal.model";
 import { AuthRepository } from "../auth/Auth.repository"; // pour vérifier si user existe
 
