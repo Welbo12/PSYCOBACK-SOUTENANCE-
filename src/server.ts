@@ -2,7 +2,7 @@ import express from "express";
 import { Request, Response } from "express";
 import pool from "./shared/database/client";
 import AuthRoutes from "./features/auth/Auth.routes";
-import JournalRoutes from "./features/JournalIntime/journal.routes";
+import JournalRoutes from "./features/JournalIntime/Journal.routes";
 
 
 const app = express();

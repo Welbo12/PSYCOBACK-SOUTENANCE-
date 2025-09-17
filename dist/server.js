@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = __importDefault(require("./shared/database/client"));
 const Auth_routes_1 = __importDefault(require("./features/auth/Auth.routes"));
-const journal_routes_1 = __importDefault(require("./features/JournalIntime/journal.routes"));
+const Journal_routes_1 = __importDefault(require("./features/JournalIntime/Journal.routes"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const PORT = 3000;
@@ -51,4 +51,4 @@ app.use("/api/auth", Auth_routes_1.default);
 app.listen(PORT, () => {
     console.log("le serveur est lancé sur le port : " + API_URL);
 });
-app.use("/api/Journal", journal_routes_1.default);
+app.use("/api/Journal", Journal_routes_1.default);
