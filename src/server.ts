@@ -2,6 +2,7 @@ import express from "express";
 import { Request, Response } from "express";
 import pool from "./shared/database/client";
 import AuthRoutes from "./features/auth/Auth.routes";
+import JournalRoutes from "./features/JournalIntime/journal.routes";
 
 
 const app = express();
@@ -42,3 +43,6 @@ app.use("/api/auth",  AuthRoutes);
 app.listen(PORT, () => {
   console.log("le serveur est lancé sur le port : " + API_URL);
 });
+
+
+app.use("/api/Journal", JournalRoutes);

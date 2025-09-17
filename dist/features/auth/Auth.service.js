@@ -314,16 +314,7 @@ class RegisterPatientService {
     // ----------------------------
     static sendOTP(userId, type) {
         return __awaiter(this, void 0, void 0, function* () {
-            const otp = this.generateOTP();
-            const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
-            // Enregistrer OTP en BDD
-            const record = yield Auth_repository_1.AuthRepository.createOTP({
-                userId,
-                otp,
-                type,
-                expiresAt,
-            });
-            // Vérifier rôle + récupérer email clair
+            // 1) Vérifier rôle + récupérer email clair AVANT de créer l'OTP
             const result = yield client_1.default.query("SELECT role, email_clair FROM utilisateur WHERE id = $1", [userId]);
             const user = result.rows[0];
             if (!user)
@@ -334,11 +325,13 @@ class RegisterPatientService {
             if (!user.email_clair) {
                 throw new Error("Adresse email claire introuvable");
             }
-            // Envoi email OTP
-            yield (0, emailUtils_1.sendEmail)(user.email_clair, type === "activation"
-                ? "Activation de votre compte"
-                : "Réinitialisation du mot de passe", `Votre code OTP est : ${otp}. Il expire dans 10 minutes.`, `<p>Votre code OTP est : <b>${otp}</b></p><p>Il expire dans 10 minutes.</p>`);
-            return { message: `OTP ${type} envoyé à ${user.email_clair}` };
+            // 2) Générer et enregistrer l'OTP une seule fois avec le type demandé
+            const otp = this.generateOTP();
+            const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+            yield Auth_repository_1.AuthRepository.createOTP({ userId, otp, type, expiresAt });
+            // 3) Envoyer l'email OTP
+            yield (0, emailUtils_1.sendOtpEmail)(user.email_clair, otp);
+            return { message: `OTP ${type} envoyé` };
         });
     }
     // ----------------------------

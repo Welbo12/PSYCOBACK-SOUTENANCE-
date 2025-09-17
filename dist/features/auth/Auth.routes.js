@@ -6,5 +6,8 @@ const router = (0, express_1.Router)();
 router.post("/register/patient", Auth_controller_1.RegisterPatientController.registerPatient);
 router.post("/login", Auth_controller_1.RegisterPatientController.login);
 router.post("/loginByClearEmail", Auth_controller_1.RegisterPatientController.loginByClearEmail);
+router.post("/request-otp", Auth_controller_1.RegisterPatientController.requestOTP);
+// Vérification OTP
+router.post("/verify-otp", Auth_controller_1.RegisterPatientController.verifyOTP);
 router.post("/register/psychologue", Auth_controller_1.RegisterPatientController.registerPsychologue);
 exports.default = router;

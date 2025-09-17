@@ -19,8 +19,7 @@ class AuthRepository {
     // -----------------------------
     // 1️⃣ Créer un patient
     // -----------------------------
-    static createPatient(pseudonyme, motdepasse, // changer ici
-    email, role) {
+    static createPatient(pseudonyme, motdepasse, email, role) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield client_1.default.query("INSERT INTO utilisateur (pseudonyme, motdepasse, email, role) VALUES ($1, $2, $3, $4) RETURNING *", [pseudonyme, motdepasse, email, role]);
             return result.rows[0];

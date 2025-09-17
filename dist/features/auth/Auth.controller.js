@@ -1,8 +1,4 @@
 "use strict";
-// import { RegisterPatientService } from "./Auth.service";
-// import { Request, Response } from "express";
-// import { IUser } from "./Auth.model";
-// import { generateToken } from "../../shared/utils/jswtUtils";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,121 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterPatientController = void 0;
-// export class RegisterPatientController {
-//   static async registerPatient(req: Request, res: Response) {
-//     try {
-//       const { pseudonyme, motDePasse, email, role } = req.body;
-//       // Appel au service pour enregistrer un utilisateur
-//       const user = await RegisterPatientService.registerPatient(
-//         pseudonyme,
-//         motDePasse,
-//         email,
-//         role
-//       );
-//       res.status(201).json({
-//         message: "Patient enregistré avec succès",
-//         data: user,
-//       });
-//     } catch (err) {
-//       console.error(err);
-//       res.status(500).json({ error: "Erreur interne du serveur" });
-//     }
-//   }
-//   static async login(req: Request, res: Response) {
-//     try {
-//       const { email, motDePasse } = req.body;
-//       // Appel au service pour connecter un utilisateur
-//       const user = await RegisterPatientService.login(email, motDePasse);
-//       // Génération du token JWT
-//       const token = generateToken({
-//         id: user.id,
-//         email: user.email,
-//         role: user.role,
-//       });
-//       res.status(200).json({
-//         success: true,
-//         token,
-//         user,
-//       });
-//     } catch (err: any) {
-//       console.error(err);
-//       // Gestion des erreurs spécifiques
-//       if (
-//         err.message === "Utilisateur introuvable" ||
-//         err.message === "Mot de passe incorrect" ||
-//         err.message === "Compte utilisateur invalide - mot de passe manquant"
-//       ) {
-//         return res.status(401).json({ error: err.message });
-//       }
-//       res.status(500).json({ error: "Erreur interne du serveur" });
-//     }
-//   }
-//   //registerPsychologue
-//   static async registerPsychologue(req: Request, res: Response) {
-//     try {
-//       const {
-//         nom,
-//         prenom,
-//         motDePasse,
-//         email_clair,
-//         domaines,
-//         sujets,
-//         methodes,
-//         description,
-//         motivation,
-//         cvUrl,
-//       } = req.body;
-//       if (!nom || !prenom || !motDePasse || !email_clair) {
-//         return res.status(400).json({ error: "Champs obligatoires manquants" });
-//       }
-//       const user = await RegisterPatientService.registerPsychologue(
-//         nom,
-//         prenom,
-//         motDePasse,
-//         email_clair,
-//         domaines || [],
-//         sujets || [],
-//         methodes || [],
-//         description || "",
-//         motivation || "",
-//         cvUrl
-//       );
-//       res
-//         .status(201)
-//         .json({ 
-//             message: "Psychologue enregistré avec succès",
-//             data: user 
-//         });
-//     } catch (error: any) {
-//       res.status(400).json({ error: error.message });
-//     }
-//   }
-//   static async loginByClearEmail(req: Request, res: Response) {
-//     try {
-//       const { email_clair, motDePasse } = req.body;
-//       // Appel au service pour connecter un utilisateur avec un email en clair
-//       const user = await RegisterPatientService.loginByClearEmail(
-//         email_clair,
-//         motDePasse
-//       );
-//       // Génération du token JWT
-//       const token = generateToken({
-//         id: user.id,
-//         email_clair: user.email_clair,
-//         role: user.role,
-//       });
-//       res.status(200).json({
-//         success: true,
-//         token,
-//         user,
-//       });
-//       console.log(user);
-//     } catch (err: any) {
-//       console.error(err);
-//       res.status(400).json({ error: err.message });
-//     }
-//   }
-// }
 const Auth_service_1 = require("./Auth.service");
 const jswtUtils_1 = require("../../shared/utils/jswtUtils");
 class RegisterPatientController {
@@ -242,14 +123,14 @@ class RegisterPatientController {
     static verifyOTP(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { userId, otp, type, newPassword } = req.body;
+                const { userId, otp, type } = req.body;
                 if (!userId || !otp || !type) {
                     return res.status(400).json({ error: "Champs obligatoires manquants" });
                 }
                 if (type !== "activation" && type !== "reset") {
                     return res.status(400).json({ error: "Type OTP invalide" });
                 }
-                const result = yield Auth_service_1.RegisterPatientService.verifyOTP(userId, otp, type, newPassword);
+                const result = yield Auth_service_1.RegisterPatientService.verifyOTP(userId, otp, type);
                 res.status(200).json(result);
             }
             catch (err) {
