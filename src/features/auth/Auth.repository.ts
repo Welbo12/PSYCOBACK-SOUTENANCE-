@@ -6,7 +6,7 @@ import { IOTP } from "./Auth.model";
 
 export class AuthRepository {
   // -----------------------------
-  // 1️⃣ Créer un patient
+  // 1️ Créer un patient
   // -----------------------------
   static async createPatient(
     pseudonyme: string,
@@ -22,7 +22,7 @@ export class AuthRepository {
   }
 
   // -----------------------------
-  // 2️⃣ Chercher patient par email
+  // 2 Chercher patient par email
   // -----------------------------
   static async findByMail(email: string) {
     const result = await pool.query(
@@ -33,7 +33,7 @@ export class AuthRepository {
   }
 
   // -----------------------------
-  // 3️⃣ Lister tous les utilisateurs
+  // 3️ Lister tous les utilisateurs
   // -----------------------------
   static async findAllUsers() {
     const result = await pool.query(
@@ -51,14 +51,14 @@ export class AuthRepository {
   }
 
   // -----------------------------
-  // 4️⃣ Hash déterministe pour email
+  // 4 Hash déterministe pour email
   // -----------------------------
   static hashEmail(email: string): string {
     return crypto.createHash("sha256").update(email).digest("hex");
   }
 
   // -----------------------------
-  // 5️⃣ Créer un psychologue
+  // Créer un psychologue
   // -----------------------------
   static async createPsychologue(
     nom: string,

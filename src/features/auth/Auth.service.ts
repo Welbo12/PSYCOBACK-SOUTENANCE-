@@ -227,7 +227,7 @@ import pool from "../../shared/database/client";
 
 export class RegisterPatientService {
   // ----------------------------
-  // 1️⃣ Enregistrement patient
+  // 1 Enregistrement patient
   // ----------------------------
   static async registerPatient(
     pseudonyme: string,
@@ -339,7 +339,7 @@ export class RegisterPatientService {
     // Hash mot de passe
     const hashedPassword = await hashPassword(motDePasse);
 
-    // Création en BDD (⚠️ pas de pseudonyme ici)
+    // Création en BDD ( pas de pseudonyme ici)
     const user = await AuthRepository.createPsychologue(
       nom,
       prenom,
@@ -357,7 +357,7 @@ export class RegisterPatientService {
   }
 
   // ----------------------------
-  // 4️⃣ Login psychologue (email clair)
+  // Login psychologue (email clair)
   // ----------------------------
   static async loginByClearEmail(email_clair: string, motDePasse: string) {
     const user = await AuthRepository.findByClearEmail(email_clair);
@@ -377,7 +377,7 @@ export class RegisterPatientService {
   }
 
   // ----------------------------
-  // 5️⃣ Génération OTP
+  //  Génération OTP
   // ----------------------------
   static generateOTP(length = 6) {
     let otp = "";
@@ -386,7 +386,7 @@ export class RegisterPatientService {
   }
 
   // ----------------------------
-  // 6️⃣ Envoi OTP (seulement psy/admin)
+  //  Envoi OTP (seulement psy/admin)
   // ----------------------------
   static async sendOTP(userId: string, type: "activation" | "reset") {
     // 1) Vérifier rôle + récupérer email clair AVANT de créer l'OTP
