@@ -232,7 +232,30 @@
 //         type === "activation" ? "Compte vérifié" : "Mot de passe réinitialisé",
 //     };
 //   }
+
+//   // Helpers to support email-first controller
+//   static async sendOTPByEmail(email: string, type: "activation" | "reset") {
+//     const user = await AuthRepository.findByClearEmail(email);
+//     if (!user) throw new Error("Utilisateur introuvable");
+//     return this.sendOTP(user.id as string, type);
+//   }
+
+//   static async verifyOTPByEmail(
+//     email: string,
+//     otp: string,
+//     type: "activation" | "reset",
+//     newPassword?: string
+//   ) {
+//     const user = await AuthRepository.findByClearEmail(email);
+//     if (!user) throw new Error("Utilisateur introuvable");
+//     return this.verifyOTP(user.id as string, otp, type, newPassword);
+//   }
 // }
+
+
+
+  
+
 import { AuthRepository } from "./Auth.repository";
 import { IUser, UserRole } from "./Auth.model";
 import { comparePassword, hashPassword } from "../../shared/utils/hashUtils";
@@ -467,20 +490,20 @@ export class RegisterPatientService {
     };
   }
 
-  // Helpers to support email-first controller
-  static async sendOTPByEmail(email: string, type: "activation" | "reset") {
-    const user = await AuthRepository.findByClearEmail(email);
+  // Helpers to support email_clair controller
+  static async sendOTPByEmailClair(email_clair: string, type: "activation" | "reset") {
+    const user = await AuthRepository.findByClearEmail(email_clair);
     if (!user) throw new Error("Utilisateur introuvable");
     return this.sendOTP(user.id as string, type);
   }
 
-  static async verifyOTPByEmail(
-    email: string,
+  static async verifyOTPByEmailClair(
+    email_clair: string,
     otp: string,
     type: "activation" | "reset",
     newPassword?: string
   ) {
-    const user = await AuthRepository.findByClearEmail(email);
+    const user = await AuthRepository.findByClearEmail(email_clair);
     if (!user) throw new Error("Utilisateur introuvable");
     return this.verifyOTP(user.id as string, otp, type, newPassword);
   }
