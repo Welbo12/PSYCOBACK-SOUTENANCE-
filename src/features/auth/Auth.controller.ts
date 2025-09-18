@@ -1,5 +1,6 @@
 
 import { RegisterPatientService } from "./Auth.service";
+import { AuthRepository } from "./Auth.repository";
 import { Request, Response } from "express";
 import { generateToken } from "../../shared/utils/jswtUtils";
  
@@ -124,10 +125,10 @@ export class RegisterPatientController {
         return res.status(400).json({ error: "Type OTP invalide" });
       }
 
-      // Si email_clair fourni, résoudre userId côté service
+      // Si email_clair fourni, résoudre userId en BDD (sans vérifier le mot de passe)
       let targetUserId = userId as string;
       if (!targetUserId && email_clair) {
-        const u = await RegisterPatientService.loginByClearEmail(email_clair, "__dummy__").catch(() => null);
+        const u = await AuthRepository.findByClearEmail(email_clair);
         if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
         targetUserId = u.id as string;
       }
