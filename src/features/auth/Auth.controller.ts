@@ -114,17 +114,25 @@ export class RegisterPatientController {
 
   static async requestOTP(req: Request, res: Response) {
     try {
-      const { userId, type } = req.body;
+      const { userId, email_clair, type } = req.body;
 
-      if (!userId || !type) {
-        return res.status(400).json({ error: "Champs obligatoires manquants" });
+      if ((!userId && !email_clair) || !type) {
+        return res.status(400).json({ error: "Fournir userId ou email_clair, et type" });
       }
 
       if (type !== "activation" && type !== "reset") {
         return res.status(400).json({ error: "Type OTP invalide" });
       }
 
-      const result = await RegisterPatientService.sendOTP(userId, type);
+      // Si email_clair fourni, résoudre userId côté service
+      let targetUserId = userId as string;
+      if (!targetUserId && email_clair) {
+        const u = await RegisterPatientService.loginByClearEmail(email_clair, "__dummy__").catch(() => null);
+        if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
+        targetUserId = u.id as string;
+      }
+
+      const result = await RegisterPatientService.sendOTP(targetUserId, type);
       res.status(200).json(result);
 
     } catch (err: any) {

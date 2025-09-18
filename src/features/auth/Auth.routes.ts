@@ -11,7 +11,7 @@ router.post("/request-otp", RegisterPatientController.requestOTP);
 
 // Vérification OTP
 router.post("/verify-otp", RegisterPatientController.verifyOTP);
-// router.post("/send-otp", RegisterPatientController.sendOTP);
+
 
 router.post(
   "/register/psychologue",
