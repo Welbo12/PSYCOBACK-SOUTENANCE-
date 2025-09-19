@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterPatientController = void 0;
 const Auth_service_1 = require("./Auth.service");
+const Auth_repository_1 = require("./Auth.repository");
 const jswtUtils_1 = require("../../shared/utils/jswtUtils");
 class RegisterPatientController {
     // ----------------------------
@@ -98,17 +99,109 @@ class RegisterPatientController {
             }
         });
     }
+    // static async requestOTP(req: Request, res: Response) {
+    //   try {
+    //     const { email, type } = req.body;
+    //     if (!email || !type) {
+    //       return res.status(400).json({ error: "Champs obligatoires manquants (email, type)" });
+    //     }
+    //     if (type !== "activation" && type !== "reset") {
+    //       return res.status(400).json({ error: "Type OTP invalide" });
+    //     }
+    //     // Résoudre userId via email clair
+    //     const u = await AuthRepository.findByClearEmail(email);
+    //     if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
+    //     const targetUserId = u.id as string;
+    //     const result = await RegisterPatientService.sendOTP(targetUserId, type);
+    //     res.status(200).json(result);
+    //   } catch (err: any) {
+    //     console.error(err);
+    //     res.status(500).json({ error: "Erreur interne du serveur" });
+    //   }
+    // }
+    // static async requestOTP(req: Request, res: Response) {
+    //   try {
+    //     const { email_clair, type } = req.body;
+    //     if (!email_clair || !type) {
+    //       return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, type)" });
+    //     }
+    //     if (type !== "activation" && type !== "reset") {
+    //       return res.status(400).json({ error: "Type OTP invalide" });
+    //     }
+    //     const u = await AuthRepository.findByClearEmail(email_clair);
+    //     if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
+    //     const targetUserId = u.id as string;
+    //     const result = await RegisterPatientService.sendOTP(targetUserId, type);
+    //     res.status(200).json(result);
+    //   } catch (err: any) {
+    //     console.error(err);
+    //     res.status(500).json({ error: "Erreur interne du serveur" });
+    //   }
+    // }
+    //   // ----------------------------
+    //   // Vérification OTP
+    //   // ----------------------------
+    //   // static async verifyOTP(req: Request, res: Response) {
+    //   //   try {
+    //   //     const { email, otp, type } = req.body;
+    //   //     if (!email || !otp || !type) {
+    //   //       return res.status(400).json({ error: "Champs obligatoires manquants (email, otp, type)" });
+    //   //     }
+    //   //     if (type !== "activation" && type !== "reset") {
+    //   //       return res.status(400).json({ error: "Type OTP invalide" });
+    //   //     }
+    //   //     // Résoudre userId via email clair
+    //   //     const u = await AuthRepository.findByClearEmail(email);
+    //   //     if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
+    //   //     const userId = u.id as string;
+    //   //     const result = await RegisterPatientService.verifyOTP(userId, otp, type);
+    //   //     res.status(200).json(result);
+    //   //   } catch (err: any) {
+    //   //     console.error(err);
+    //   //     // Cas OTP invalide ou expiré
+    //   //     if (err.message.includes("OTP invalide") || err.message.includes("Nouveau mot de passe requis")) {
+    //   //       return res.status(400).json({ error: err.message });
+    //   //     }
+    //   //     res.status(500).json({ error: "Erreur interne du serveur" });
+    //   //   }
+    //   // }
+    //   static async verifyOTP(req: Request, res: Response) {
+    //   try {
+    //     const { email_clair, otp, type } = req.body;
+    //     if (!email_clair || !otp || !type) {
+    //       return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, otp, type)" });
+    //     }
+    //     if (type !== "activation" && type !== "reset") {
+    //       return res.status(400).json({ error: "Type OTP invalide" });
+    //     }
+    //     const u = await AuthRepository.findByClearEmail(email_clair);
+    //     if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
+    //     const userId = u.id as string;
+    //     const result = await RegisterPatientService.verifyOTP(userId, otp, type);
+    //     res.status(200).json(result);
+    //   } catch (err: any) {
+    //     console.error(err);
+    //     if (err.message.includes("OTP invalide") || err.message.includes("Nouveau mot de passe requis")) {
+    //       return res.status(400).json({ error: err.message });
+    //     }
+    //     res.status(500).json({ error: "Erreur interne du serveur" });
+    //   }
+    // }
     static requestOTP(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { userId, type } = req.body;
-                if (!userId || !type) {
-                    return res.status(400).json({ error: "Champs obligatoires manquants" });
+                const { email_clair, type } = req.body;
+                if (!email_clair || !type) {
+                    return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, type)" });
                 }
                 if (type !== "activation" && type !== "reset") {
                     return res.status(400).json({ error: "Type OTP invalide" });
                 }
-                const result = yield Auth_service_1.RegisterPatientService.sendOTP(userId, type);
+                const u = yield Auth_repository_1.AuthRepository.findByClearEmail(email_clair);
+                if (!u)
+                    return res.status(404).json({ error: "Utilisateur introuvable" });
+                const targetUserId = u.id;
+                const result = yield Auth_service_1.RegisterPatientService.sendOTP(targetUserId, type);
                 res.status(200).json(result);
             }
             catch (err) {
@@ -117,26 +210,65 @@ class RegisterPatientController {
             }
         });
     }
-    // ----------------------------
-    // Vérification OTP
-    // ----------------------------
+    //   static async verifyOTP(req: Request, res: Response) {
+    //   try {
+    //     const { email_clair, otp, type } = req.body;
+    //     if (!email_clair || !otp || !type) {
+    //       return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, otp, type)" });
+    //     }
+    //     if (type !== "activation" && type !== "reset") {
+    //       return res.status(400).json({ error: "Type OTP invalide" });
+    //     }
+    //     const u = await AuthRepository.findByClearEmail(email_clair);
+    //     if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
+    //     const userId = u.id as string;
+    //     const result = await RegisterPatientService.verifyOTP(userId, otp, type);
+    //     res.status(200).json(result);
+    //   } catch (err: any) {
+    //     console.error(err);
+    //     if (err.message.includes("OTP invalide") || err.message.includes("Nouveau mot de passe requis")) {
+    //       return res.status(400).json({ error: err.message });
+    //     }
+    //     res.status(500).json({ error: "Erreur interne du serveur" });
+    //   }
+    // }
     static verifyOTP(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { userId, otp, type } = req.body;
-                if (!userId || !otp || !type) {
-                    return res.status(400).json({ error: "Champs obligatoires manquants" });
+                const { email_clair, otp, type } = req.body;
+                if (!email_clair || !otp || !type) {
+                    return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, otp, type)" });
                 }
                 if (type !== "activation" && type !== "reset") {
                     return res.status(400).json({ error: "Type OTP invalide" });
                 }
-                const result = yield Auth_service_1.RegisterPatientService.verifyOTP(userId, otp, type);
+                // Utiliser le helper du service qui gère email_clair
+                const result = yield Auth_service_1.RegisterPatientService.verifyOTPByEmailClair(email_clair, otp, type);
                 res.status(200).json(result);
             }
             catch (err) {
                 console.error(err);
-                // Cas OTP invalide ou expiré
-                if (err.message.includes("OTP invalide") || err.message.includes("Nouveau mot de passe requis")) {
+                if (err.message.includes("OTP invalide")) {
+                    return res.status(400).json({ error: err.message });
+                }
+                res.status(500).json({ error: "Erreur interne du serveur" });
+            }
+        });
+    }
+    static resetPassword(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { email_clair, otp, newPassword } = req.body;
+                if (!email_clair || !otp || !newPassword) {
+                    return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, otp, newPassword)" });
+                }
+                // Utiliser le helper du service pour reset password
+                const result = yield Auth_service_1.RegisterPatientService.resetPasswordByEmailClair(email_clair, otp, newPassword);
+                res.status(200).json(result);
+            }
+            catch (err) {
+                console.error(err);
+                if (err.message.includes("OTP invalide")) {
                     return res.status(400).json({ error: err.message });
                 }
                 res.status(500).json({ error: "Erreur interne du serveur" });

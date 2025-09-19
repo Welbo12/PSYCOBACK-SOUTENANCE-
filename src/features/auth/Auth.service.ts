@@ -202,13 +202,12 @@ export class RegisterPatientService {
   }
 
   // ----------------------------
-  // 7️⃣ Vérification OTP et action
+  // 7️⃣ Vérification OTP (sans action)
   // ----------------------------
   static async verifyOTP(
     userId: string,
     otp: string,
-    type: "activation" | "reset",
-    newPassword?: string
+    type: "activation" | "reset"
   ) {
     const record = await AuthRepository.findValidOTP(userId, otp, type);
     if (!record) throw new Error("OTP invalide ou expiré");
@@ -218,21 +217,42 @@ export class RegisterPatientService {
       await pool.query("UPDATE utilisateur SET verified = true WHERE id = $1", [
         userId,
       ]);
-    } else if (type === "reset") {
-      if (!newPassword) throw new Error("Nouveau mot de passe requis");
-      const hashedPassword = await hashPassword(newPassword);
-      await pool.query(
-        "UPDATE utilisateur SET motdepasse = $1 WHERE id = $2",
-        [hashedPassword, userId]
-      );
+      // Marquer OTP comme utilisé
+      await AuthRepository.markOTPUsed(record.id!);
     }
+    // Pour le reset, on ne fait que vérifier l'OTP, on ne le marque pas comme utilisé encore
+
+    return {
+      message: type === "activation" ? "Compte vérifié" : "OTP validé, vous pouvez maintenant réinitialiser votre mot de passe",
+    };
+  }
+
+  // ----------------------------
+  // 8️⃣ Reset password après vérification OTP
+  // ----------------------------
+  static async resetPasswordAfterOTP(
+    userId: string,
+    otp: string,
+    newPassword: string
+  ) {
+    // Vérifier que l'OTP est valide et non utilisé
+    const record = await AuthRepository.findValidOTP(userId, otp, "reset");
+    if (!record) throw new Error("OTP invalide ou expiré");
+
+    // Hasher le nouveau mot de passe
+    const hashedPassword = await hashPassword(newPassword);
+    
+    // Mettre à jour le mot de passe
+    await pool.query(
+      "UPDATE utilisateur SET motdepasse = $1 WHERE id = $2",
+      [hashedPassword, userId]
+    );
 
     // Marquer OTP comme utilisé
     await AuthRepository.markOTPUsed(record.id!);
 
     return {
-      message:
-        type === "activation" ? "Compte vérifié" : "Mot de passe réinitialisé",
+      message: "Mot de passe réinitialisé avec succès",
     };
   }
 
@@ -246,11 +266,20 @@ export class RegisterPatientService {
   static async verifyOTPByEmailClair(
     email_clair: string,
     otp: string,
-    type: "activation" | "reset",
-    newPassword?: string
+    type: "activation" | "reset"
   ) {
     const user = await AuthRepository.findByClearEmail(email_clair);
     if (!user) throw new Error("Utilisateur introuvable");
-    return this.verifyOTP(user.id as string, otp, type, newPassword);
+    return this.verifyOTP(user.id as string, otp, type);
+  }
+
+  static async resetPasswordByEmailClair(
+    email_clair: string,
+    otp: string,
+    newPassword: string
+  ) {
+    const user = await AuthRepository.findByClearEmail(email_clair);
+    if (!user) throw new Error("Utilisateur introuvable");
+    return this.resetPasswordAfterOTP(user.id as string, otp, newPassword);
   }
 }

@@ -277,7 +277,7 @@ static async requestOTP(req: Request, res: Response) {
 
 static async verifyOTP(req: Request, res: Response) {
   try {
-    const { email_clair, otp, type, newPassword } = req.body;
+    const { email_clair, otp, type } = req.body;
 
     if (!email_clair || !otp || !type) {
       return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, otp, type)" });
@@ -288,11 +288,31 @@ static async verifyOTP(req: Request, res: Response) {
     }
 
     // Utiliser le helper du service qui gère email_clair
-    const result = await RegisterPatientService.verifyOTPByEmailClair(email_clair, otp, type, newPassword);
+    const result = await RegisterPatientService.verifyOTPByEmailClair(email_clair, otp, type);
     res.status(200).json(result);
   } catch (err: any) {
     console.error(err);
-    if (err.message.includes("OTP invalide") || err.message.includes("Nouveau mot de passe requis")) {
+    if (err.message.includes("OTP invalide")) {
+      return res.status(400).json({ error: err.message });
+    }
+    res.status(500).json({ error: "Erreur interne du serveur" });
+  }
+}
+
+static async resetPassword(req: Request, res: Response) {
+  try {
+    const { email_clair, otp, newPassword } = req.body;
+
+    if (!email_clair || !otp || !newPassword) {
+      return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, otp, newPassword)" });
+    }
+
+    // Utiliser le helper du service pour reset password
+    const result = await RegisterPatientService.resetPasswordByEmailClair(email_clair, otp, newPassword);
+    res.status(200).json(result);
+  } catch (err: any) {
+    console.error(err);
+    if (err.message.includes("OTP invalide")) {
       return res.status(400).json({ error: err.message });
     }
     res.status(500).json({ error: "Erreur interne du serveur" });

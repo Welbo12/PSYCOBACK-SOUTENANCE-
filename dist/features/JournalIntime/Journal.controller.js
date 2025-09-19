@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JournalController = void 0;
-const journal_service_1 = require("../JournalIntime/journal.service");
+const Journal_service_1 = require("./Journal.service");
 class JournalController {
     // ➕ Créer/MàJ le journal de l'utilisateur connecté
     static upsert(req, res) {
@@ -21,7 +21,7 @@ class JournalController {
                 if (!(user === null || user === void 0 ? void 0 : user.id) || typeof contenu !== "string") {
                     return res.status(400).json({ error: "Contenu requis" });
                 }
-                const journal = yield journal_service_1.JournalService.upsertUserJournal(user.id, contenu);
+                const journal = yield Journal_service_1.JournalService.upsertUserJournal(user.id, contenu);
                 res.status(201).json(journal);
             }
             catch (err) {
@@ -34,7 +34,7 @@ class JournalController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const user = req.user;
-                const entry = yield journal_service_1.JournalService.getUserJournal(user.id);
+                const entry = yield Journal_service_1.JournalService.getUserJournal(user.id);
                 res.json(entry);
             }
             catch (err) {
@@ -48,7 +48,7 @@ class JournalController {
             try {
                 const user = req.user;
                 const { contenu } = req.body;
-                const updated = yield journal_service_1.JournalService.updateUserJournal(user.id, contenu);
+                const updated = yield Journal_service_1.JournalService.updateUserJournal(user.id, contenu);
                 res.json(updated);
             }
             catch (err) {
@@ -61,7 +61,7 @@ class JournalController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const user = req.user;
-                yield journal_service_1.JournalService.deleteUserJournal(user.id);
+                yield Journal_service_1.JournalService.deleteUserJournal(user.id);
                 res.json({ message: "Journal supprimé" });
             }
             catch (err) {

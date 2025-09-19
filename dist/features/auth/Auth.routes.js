@@ -9,5 +9,7 @@ router.post("/loginByClearEmail", Auth_controller_1.RegisterPatientController.lo
 router.post("/request-otp", Auth_controller_1.RegisterPatientController.requestOTP);
 // Vérification OTP
 router.post("/verify-otp", Auth_controller_1.RegisterPatientController.verifyOTP);
+// Reset password après vérification OTP
+router.post("/reset-password", Auth_controller_1.RegisterPatientController.resetPassword);
 router.post("/register/psychologue", Auth_controller_1.RegisterPatientController.registerPsychologue);
 exports.default = router;

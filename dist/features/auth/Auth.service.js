@@ -1,19 +1,4 @@
 "use strict";
-// import { AuthRepository } from "./Auth.repository";
-// import { IUser } from "./Auth.model";
-// import { comparePassword, hashPassword } from "../../shared/utils/hashUtils";
-// import { cryptEmail, compareEmail } from "../../shared/utils/cryptUtils";
-// import pool from "../../shared/database/client";
-// import { sendEmail } from "../../shared/utils/emailUtils"
-// export class RegisterPatientService {
-//     // ----------------------------
-//     // 1️⃣ Enregistrement patient
-//     // ----------------------------
-//     static async registerPatient(pseudonyme: string, motDePasse: string, email: string, role: string) {
-//         try {
-//             if (!pseudonyme || !motDePasse || !email) {
-//                 throw new Error("Champs obligatoires manquants");
-//             }
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -28,171 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterPatientService = void 0;
-//             // Crypter l'email et hasher le mot de passe
-//             const encryptedEmail = await cryptEmail(email);
-//             const hashedPassword = await hashPassword(motDePasse);
-//             // Créer un nouvel utilisateur patient
-//             const user = await AuthRepository.createPatient(pseudonyme, hashedPassword, encryptedEmail, role);
-//             return user;
-//         } catch (error: any) {
-//             // Gestion des erreurs de contrainte unique (Postgres)
-//             if (error.code === '23505') {
-//                 if (error.constraint === 'utilisateur_pseudonyme_key') {
-//                     throw new Error("Ce pseudonyme est déjà utilisé. Veuillez en choisir un autre.");
-//                 } else if (error.constraint === 'utilisateur_email_key') {
-//                     throw new Error("Cette adresse email est déjà utilisée.");
-//                 } else {
-//                     throw new Error("Cette information est déjà utilisée par un autre utilisateur.");
-//                 }
-//             }
-//             throw error;
-//         }
-//     }
-//     // ----------------------------
-//     // 2️⃣ Login patient (email crypté)
-//     // ----------------------------
-//     static async login(email: string, motDePasse: string) {
-//         const users = await AuthRepository.findAllUsers();
-//         let user = null;
-//         for (const u of users) {
-//             if (!u.email) continue;
-//             const emailToCompare = Buffer.isBuffer(u.email) ? u.email.toString() : u.email;
-//             const isEmailValid = await compareEmail(email, emailToCompare);
-//             if (isEmailValid) {
-//                 user = u;
-//                 break;
-//             }
-//         }
-//         if (!user) {
-//             throw new Error("Utilisateur introuvable");
-//         }
-//         if (!user.motDePasse) {
-//             throw new Error("Compte utilisateur invalide - mot de passe manquant");
-//         }
-//         const isPasswordValid = await comparePassword(motDePasse, user.motDePasse);
-//         if (!isPasswordValid) {
-//             throw new Error("Mot de passe incorrect");
-//         }
-//         return user;
-//     }
-//     // ----------------------------
-//     // 3️⃣ Enregistrement psychologue (email clair + pas de pseudonyme obligatoire)
-//     // ----------------------------
-//     static async registerPsychologue(
-//         nom: string,
-//         prenom: string,
-//         motDePasse: string,
-//         email_clair: string,
-//         domaines: string[],
-//         sujets: string[],
-//         methodes: string[],
-//         description: string,
-//         motivation: string,
-//         cvUrl?: string
-//     ): Promise<IUser> {
-//         if (!nom || !prenom || !motDePasse || !email_clair) {
-//             throw new Error("Champs obligatoires manquants");
-//         }
-//         // Vérif si mail déjà utilisé
-//         const existing = await AuthRepository.findByClearEmail(email_clair);
-//         if (existing) {
-//             throw new Error("Un utilisateur avec cet email existe déjà");
-//         }
-//         // Hash mot de passe
-//         const hashedPassword = await hashPassword(motDePasse);
-//         // Création en BDD (⚠️ pas de pseudonyme ici)
-//         const user = await AuthRepository.createPsychologue(
-//             nom,
-//             prenom,
-//             hashedPassword,
-//             email_clair,
-//             domaines,
-//             sujets,
-//             methodes,
-//             description,
-//             motivation,
-//             cvUrl
-//         );
-//         return user;
-//     }
-//     // ----------------------------
-//     // 4️⃣ Login psychologue (email clair)
-//     // ----------------------------
-//     static async loginByClearEmail(email_clair: string, motDePasse: string) {
-//         const user = await AuthRepository.findByClearEmail(email_clair);
-//         if (!user) {
-//             throw new Error("Utilisateur introuvable");
-//         }
-//         const isPasswordValid = await comparePassword(motDePasse, user.motDePasse);
-//         if (!isPasswordValid) {
-//             throw new Error("Mot de passe incorrect");
-//         }
-//         return user;
-//     }
-//     static generateOTP(length = 6) {
-//     let otp = "";
-//     for (let i = 0; i < length; i++) otp += Math.floor(Math.random() * 10);
-//     return otp;
-//   }
-//   // ----------------------------
-//   // Envoi OTP (activation ou reset)
-//   // ----------------------------
-//   static async sendOTP(userId: string, type: "activation" | "reset") {
-//     const otp = this.generateOTP();
-//     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
-//     await AuthRepository.createOTP({ userId, otp, type, expiresAt });
-//     // TODO: envoyer l'OTP par email
-//     console.log(`OTP ${type} pour l'utilisateur ${userId}: ${otp}`);
-//     return { message: `OTP ${type} envoyé` };
-//   }
-//   // ----------------------------
-//   // Vérification OTP et action
-//   // ----------------------------
-//   static async verifyOTP(userId: string, otp: string, type: "activation" | "reset", newPassword?: string) {
-//     const record = await AuthRepository.findValidOTP(userId, otp, type);
-//     if (!record) throw new Error("OTP invalide ou expiré");
-//     if (type === "activation") {
-//       // Marquer utilisateur comme vérifié
-//       await pool.query("UPDATE utilisateur SET verified = true WHERE id = $1", [userId]);
-//     } else if (type === "reset") {
-//       if (!newPassword) throw new Error("Nouveau mot de passe requis");
-//       const hashedPassword = await hashPassword(newPassword);
-//       await pool.query("UPDATE utilisateur SET motdepasse = $1 WHERE id = $2", [hashedPassword, userId]);
-//     }
-//     // Marquer OTP comme utilisé
-//     await AuthRepository.markOTPUsed(record.id!);
-//     return { message: type === "activation" ? "Compte vérifié" : "Mot de passe réinitialisé" };
-//   }
-// static async sendOTP(userId: string, type: "activation" | "reset") {
-//   const otp = this.generateOTP();
-//   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // expire dans 10 min
-//   // Sauvegarde OTP en base
-//   const record = await AuthRepository.createOTP({ userId, otp, type, expiresAt });
-//   // Récupérer l'email clair si dispo
-//   const result = await pool.query("SELECT email_clair, email FROM utilisateur WHERE id = $1", [userId]);
-//   const user = result.rows[0];
-//   if (!user) throw new Error("Utilisateur introuvable");
-//   let destinataire: string | null = null;
-//   if (user.email_clair) {
-//     destinataire = user.email_clair; // cas psychologue/admin
-//   } else if (user.email) {
-//     // cas patient : impossible de décrypter directement si tu utilises cryptEmail()
-//     // soit tu conserves aussi un champ email_clair pour OTP, soit tu ajoutes une logique spéciale
-//     throw new Error("Impossible d’envoyer OTP : email crypté");
-//   }
-//   if (!destinataire) {
-//     throw new Error("Aucune adresse email disponible pour l'utilisateur");
-//   }
-//   // Envoi réel de l'email
-//   await sendEmail(
-//     destinataire,
-//     type === "activation" ? "Activation de votre compte" : "Réinitialisation du mot de passe",
-//     `Votre code OTP est : ${otp}. Il expire dans 10 minutes.`,
-//     `<p>Votre code OTP est : <b>${otp}</b></p><p>Il expire dans 10 minutes.</p>`
-//   );
-//   return { message: `OTP ${type} envoyé à ${destinataire}` };
-// }
-// }
 const Auth_repository_1 = require("./Auth.repository");
 const hashUtils_1 = require("../../shared/utils/hashUtils");
 const cryptUtils_1 = require("../../shared/utils/cryptUtils");
@@ -200,7 +20,7 @@ const emailUtils_1 = require("../../shared/utils/emailUtils");
 const client_1 = __importDefault(require("../../shared/database/client"));
 class RegisterPatientService {
     // ----------------------------
-    // 1️⃣ Enregistrement patient
+    // 1 Enregistrement patient
     // ----------------------------
     static registerPatient(pseudonyme, motDePasse, email, role) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -279,13 +99,13 @@ class RegisterPatientService {
             }
             // Hash mot de passe
             const hashedPassword = yield (0, hashUtils_1.hashPassword)(motDePasse);
-            // Création en BDD (⚠️ pas de pseudonyme ici)
+            // Création en BDD ( pas de pseudonyme ici)
             const user = yield Auth_repository_1.AuthRepository.createPsychologue(nom, prenom, hashedPassword, email_clair, domaines, sujets, methodes, description, motivation, cvUrl);
             return user;
         });
     }
     // ----------------------------
-    // 4️⃣ Login psychologue (email clair)
+    // Login psychologue (email clair)
     // ----------------------------
     static loginByClearEmail(email_clair, motDePasse) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -301,7 +121,7 @@ class RegisterPatientService {
         });
     }
     // ----------------------------
-    // 5️⃣ Génération OTP
+    //  Génération OTP
     // ----------------------------
     static generateOTP(length = 6) {
         let otp = "";
@@ -310,7 +130,7 @@ class RegisterPatientService {
         return otp;
     }
     // ----------------------------
-    // 6️⃣ Envoi OTP (seulement psy/admin)
+    //  Envoi OTP (seulement psy/admin)
     // ----------------------------
     static sendOTP(userId, type) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -335,9 +155,9 @@ class RegisterPatientService {
         });
     }
     // ----------------------------
-    // 7️⃣ Vérification OTP et action
+    // 7️⃣ Vérification OTP (sans action)
     // ----------------------------
-    static verifyOTP(userId, otp, type, newPassword) {
+    static verifyOTP(userId, otp, type) {
         return __awaiter(this, void 0, void 0, function* () {
             const record = yield Auth_repository_1.AuthRepository.findValidOTP(userId, otp, type);
             if (!record)
@@ -347,18 +167,58 @@ class RegisterPatientService {
                 yield client_1.default.query("UPDATE utilisateur SET verified = true WHERE id = $1", [
                     userId,
                 ]);
+                // Marquer OTP comme utilisé
+                yield Auth_repository_1.AuthRepository.markOTPUsed(record.id);
             }
-            else if (type === "reset") {
-                if (!newPassword)
-                    throw new Error("Nouveau mot de passe requis");
-                const hashedPassword = yield (0, hashUtils_1.hashPassword)(newPassword);
-                yield client_1.default.query("UPDATE utilisateur SET motdepasse = $1 WHERE id = $2", [hashedPassword, userId]);
-            }
+            // Pour le reset, on ne fait que vérifier l'OTP, on ne le marque pas comme utilisé encore
+            return {
+                message: type === "activation" ? "Compte vérifié" : "OTP validé, vous pouvez maintenant réinitialiser votre mot de passe",
+            };
+        });
+    }
+    // ----------------------------
+    // 8️⃣ Reset password après vérification OTP
+    // ----------------------------
+    static resetPasswordAfterOTP(userId, otp, newPassword) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Vérifier que l'OTP est valide et non utilisé
+            const record = yield Auth_repository_1.AuthRepository.findValidOTP(userId, otp, "reset");
+            if (!record)
+                throw new Error("OTP invalide ou expiré");
+            // Hasher le nouveau mot de passe
+            const hashedPassword = yield (0, hashUtils_1.hashPassword)(newPassword);
+            // Mettre à jour le mot de passe
+            yield client_1.default.query("UPDATE utilisateur SET motdepasse = $1 WHERE id = $2", [hashedPassword, userId]);
             // Marquer OTP comme utilisé
             yield Auth_repository_1.AuthRepository.markOTPUsed(record.id);
             return {
-                message: type === "activation" ? "Compte vérifié" : "Mot de passe réinitialisé",
+                message: "Mot de passe réinitialisé avec succès",
             };
+        });
+    }
+    // Helpers to support email_clair controller
+    static sendOTPByEmailClair(email_clair, type) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield Auth_repository_1.AuthRepository.findByClearEmail(email_clair);
+            if (!user)
+                throw new Error("Utilisateur introuvable");
+            return this.sendOTP(user.id, type);
+        });
+    }
+    static verifyOTPByEmailClair(email_clair, otp, type) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield Auth_repository_1.AuthRepository.findByClearEmail(email_clair);
+            if (!user)
+                throw new Error("Utilisateur introuvable");
+            return this.verifyOTP(user.id, otp, type);
+        });
+    }
+    static resetPasswordByEmailClair(email_clair, otp, newPassword) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield Auth_repository_1.AuthRepository.findByClearEmail(email_clair);
+            if (!user)
+                throw new Error("Utilisateur introuvable");
+            return this.resetPasswordAfterOTP(user.id, otp, newPassword);
         });
     }
 }
