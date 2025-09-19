@@ -246,9 +246,38 @@ static async requestOTP(req: Request, res: Response) {
   }
 }
 
-  static async verifyOTP(req: Request, res: Response) {
+//   static async verifyOTP(req: Request, res: Response) {
+//   try {
+//     const { email_clair, otp, type } = req.body;
+
+//     if (!email_clair || !otp || !type) {
+//       return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, otp, type)" });
+//     }
+
+//     if (type !== "activation" && type !== "reset") {
+//       return res.status(400).json({ error: "Type OTP invalide" });
+//     }
+
+//     const u = await AuthRepository.findByClearEmail(email_clair);
+//     if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
+//     const userId = u.id as string;
+
+//     const result = await RegisterPatientService.verifyOTP(userId, otp, type);
+//     res.status(200).json(result);
+//   } catch (err: any) {
+//     console.error(err);
+//     if (err.message.includes("OTP invalide") || err.message.includes("Nouveau mot de passe requis")) {
+//       return res.status(400).json({ error: err.message });
+//     }
+//     res.status(500).json({ error: "Erreur interne du serveur" });
+//   }
+// }
+
+
+
+static async verifyOTP(req: Request, res: Response) {
   try {
-    const { email_clair, otp, type } = req.body;
+    const { email_clair, otp, type, newPassword } = req.body;
 
     if (!email_clair || !otp || !type) {
       return res.status(400).json({ error: "Champs obligatoires manquants (email_clair, otp, type)" });
@@ -258,11 +287,8 @@ static async requestOTP(req: Request, res: Response) {
       return res.status(400).json({ error: "Type OTP invalide" });
     }
 
-    const u = await AuthRepository.findByClearEmail(email_clair);
-    if (!u) return res.status(404).json({ error: "Utilisateur introuvable" });
-    const userId = u.id as string;
-
-    const result = await RegisterPatientService.verifyOTP(userId, otp, type);
+    // Utiliser le helper du service qui gère email_clair
+    const result = await RegisterPatientService.verifyOTPByEmailClair(email_clair, otp, type, newPassword);
     res.status(200).json(result);
   } catch (err: any) {
     console.error(err);
@@ -272,4 +298,6 @@ static async requestOTP(req: Request, res: Response) {
     res.status(500).json({ error: "Erreur interne du serveur" });
   }
 }
+
 }
+
