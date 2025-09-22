@@ -5,7 +5,7 @@ export class JournalRepository {
   // ➤ Créer une nouvelle entrée dans le journal
   static async create(utilisateurId: string, contenu: string): Promise<IJournal> {
     const result = await pool.query(
-      `INSERT INTO journal_entries (utilisateur_id, contenu)
+      `INSERT INTO journal (utilisateur_id, contenu)
        VALUES ($1, $2)
        RETURNING *`,
       [utilisateurId, contenu]
@@ -16,7 +16,7 @@ export class JournalRepository {
   // ➤ Récupérer toutes les entrées d’un utilisateur (ordre chronologique inverse)
   static async findByUser(utilisateurId: string): Promise<IJournal[]> {
     const result = await pool.query(
-      `SELECT * FROM journal_entries
+      `SELECT * FROM journal
        WHERE utilisateur_id = $1
        ORDER BY date_creation DESC`,
       [utilisateurId]
@@ -27,7 +27,7 @@ export class JournalRepository {
   // ➤ Mettre à jour une entrée spécifique par son id
   static async updateById(id: string, contenu: string): Promise<IJournal | null> {
     const result = await pool.query(
-      `UPDATE journal_entries
+      `UPDATE journal
        SET contenu = $2
        WHERE id = $1
        RETURNING *`,
@@ -39,7 +39,7 @@ export class JournalRepository {
   // ➤ Supprimer une entrée spécifique
   static async deleteById(id: string): Promise<void> {
     await pool.query(
-      `DELETE FROM journal_entries WHERE id = $1`,
+      `DELETE FROM journal WHERE id = $1`,
       [id]
     );
   }
