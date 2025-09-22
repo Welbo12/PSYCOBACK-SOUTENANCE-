@@ -3,50 +3,62 @@ import { Request, Response } from "express";
 import { JournalService } from "./Journal.service";
 
 export class JournalController {
-  // ➕ Créer/MàJ le journal de l'utilisateur connecté
-  static async upsert(req: Request, res: Response) {
+  // ➕ Créer une nouvelle entrée pour l'utilisateur connecté
+  static async create(req: Request, res: Response) {
     try {
       const user = (req as any).user;
       const { contenu } = req.body;
+
       if (!user?.id || typeof contenu !== "string") {
         return res.status(400).json({ error: "Contenu requis" });
       }
-      const journal = await JournalService.upsertUserJournal(user.id, contenu);
+
+      const journal = await JournalService.createEntry(user.id, contenu);
       res.status(201).json(journal);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }
   }
 
-  // 📖 Récupérer le journal de l'utilisateur connecté
-  static async me(req: Request, res: Response) {
+  // 📖 Récupérer toutes les entrées du journal de l'utilisateur connecté
+  static async list(req: Request, res: Response) {
     try {
       const user = (req as any).user;
-      const entry = await JournalService.getUserJournal(user.id);
-      res.json(entry);
+      const entries = await JournalService.getUserEntries(user.id);
+      res.json(entries);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }
   }
 
-  // ✏️ Modifier le journal de l'utilisateur
+  // ✏️ Modifier une entrée spécifique par ID
   static async update(req: Request, res: Response) {
     try {
-      const user = (req as any).user;
+      const { id } = req.params;
       const { contenu } = req.body;
-      const updated = await JournalService.updateUserJournal(user.id, contenu);
+
+      if (!id || typeof contenu !== "string") {
+        return res.status(400).json({ error: "ID et contenu requis" });
+      }
+
+      const updated = await JournalService.updateEntry(id, contenu);
       res.json(updated);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }
   }
 
-  // ❌ Supprimer le journal de l'utilisateur
+  // ❌ Supprimer une entrée spécifique par ID
   static async remove(req: Request, res: Response) {
     try {
-      const user = (req as any).user;
-      await JournalService.deleteUserJournal(user.id);
-      res.json({ message: "Journal supprimé" });
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: "ID requis" });
+      }
+
+      await JournalService.deleteEntry(id);
+      res.json({ message: "Entrée supprimée" });
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }

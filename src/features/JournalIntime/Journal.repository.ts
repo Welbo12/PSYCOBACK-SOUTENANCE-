@@ -2,39 +2,45 @@ import pool from "../../shared/database/client";
 import { IJournal } from "./Journal.model";
 
 export class JournalRepository {
-  // Créer ou mettre à jour le journal d'un utilisateur (1 journal par utilisateur)
-  static async createOrUpdate(utilisateurId: string, contenu: string) {
+  // ➤ Créer une nouvelle entrée dans le journal
+  static async create(utilisateurId: string, contenu: string): Promise<IJournal> {
     const result = await pool.query(
-      `INSERT INTO journal (utilisateur_id, contenu)
+      `INSERT INTO journal_entries (utilisateur_id, contenu)
        VALUES ($1, $2)
-       ON CONFLICT (utilisateur_id)
-       DO UPDATE SET contenu = EXCLUDED.contenu
        RETURNING *`,
       [utilisateurId, contenu]
     );
     return result.rows[0];
   }
 
-  // Récupérer le journal d’un utilisateur
-  static async findByUser(utilisateurId: string) {
+  // ➤ Récupérer toutes les entrées d’un utilisateur (ordre chronologique inverse)
+  static async findByUser(utilisateurId: string): Promise<IJournal[]> {
     const result = await pool.query(
-      `SELECT * FROM journal WHERE utilisateur_id = $1`,
+      `SELECT * FROM journal_entries
+       WHERE utilisateur_id = $1
+       ORDER BY date_creation DESC`,
       [utilisateurId]
     );
-    return result.rows[0] || null;
+    return result.rows;
   }
 
-  // Mettre à jour le journal par utilisateur
-  static async updateByUser(utilisateurId: string, contenu: string) {
+  // ➤ Mettre à jour une entrée spécifique par son id
+  static async updateById(id: string, contenu: string): Promise<IJournal | null> {
     const result = await pool.query(
-      `UPDATE journal SET contenu = $2 WHERE utilisateur_id = $1 RETURNING *`,
-      [utilisateurId, contenu]
+      `UPDATE journal_entries
+       SET contenu = $2
+       WHERE id = $1
+       RETURNING *`,
+      [id, contenu]
     );
     return result.rows[0] || null;
   }
 
-  // Supprimer le journal par utilisateur
-  static async deleteByUser(utilisateurId: string) {
-    await pool.query(`DELETE FROM journal WHERE utilisateur_id = $1`, [utilisateurId]);
+  // ➤ Supprimer une entrée spécifique
+  static async deleteById(id: string): Promise<void> {
+    await pool.query(
+      `DELETE FROM journal_entries WHERE id = $1`,
+      [id]
+    );
   }
 }

@@ -7,16 +7,16 @@ const router = Router();
 // Toutes les routes journal sont protégées et basées sur l'utilisateur connecté
 router.use(authenticate);
 
-//  Récupérer le journal de l'utilisateur connecté
-router.get("/me", JournalController.me);
+// 📖 Récupérer toutes les entrées du journal de l'utilisateur connecté
+router.get("/", JournalController.list);
 
-// Créer/MàJ le journal de l'utilisateur connecté
-router.post("/", JournalController.upsert);
+// ➕ Créer une nouvelle entrée
+router.post("/", JournalController.create);
 
-//  Modifier le journal
-router.put("/", JournalController.update);
+// ✏️ Modifier une entrée spécifique
+router.put("/:id", JournalController.update);
 
-//  Supprimer le journal
-router.delete("/", JournalController.remove);
+// ❌ Supprimer une entrée spécifique
+router.delete("/:id", JournalController.remove);
 
 export default router;
