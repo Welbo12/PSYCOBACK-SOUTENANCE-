@@ -16,8 +16,13 @@ const express_1 = __importDefault(require("express"));
 const client_1 = __importDefault(require("./shared/database/client"));
 const Auth_routes_1 = __importDefault(require("./features/auth/Auth.routes"));
 const Journal_routes_1 = __importDefault(require("./features/JournalIntime/Journal.routes"));
+const Device_routes_1 = __importDefault(require("./features/Notification/Device/Device.routes"));
+const Emergencie_routes_1 = __importDefault(require("./features/Notification/Emergencie/Emergencie.routes"));
+const resource_route_1 = __importDefault(require("./features/Resources/resource.route"));
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use((0, cors_1.default)());
 const PORT = 3000;
 const API_URL = "http://localhost:3000";
 app.get("/", (req, res) => {
@@ -52,3 +57,6 @@ app.listen(PORT, () => {
     console.log("le serveur est lancé sur le port : " + API_URL);
 });
 app.use("/api/Journal", Journal_routes_1.default);
+app.use("/api/device", Device_routes_1.default);
+app.use("/api/emergency", Emergencie_routes_1.default);
+app.use("/api/resources", resource_route_1.default);

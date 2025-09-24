@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JournalController = void 0;
 const Journal_service_1 = require("./Journal.service");
 class JournalController {
-    // ➕ Créer/MàJ le journal de l'utilisateur connecté
-    static upsert(req, res) {
+    // ➕ Créer une nouvelle entrée pour l'utilisateur connecté
+    static create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const user = req.user;
@@ -21,7 +21,7 @@ class JournalController {
                 if (!(user === null || user === void 0 ? void 0 : user.id) || typeof contenu !== "string") {
                     return res.status(400).json({ error: "Contenu requis" });
                 }
-                const journal = yield Journal_service_1.JournalService.upsertUserJournal(user.id, contenu);
+                const journal = yield Journal_service_1.JournalService.createEntry(user.id, contenu);
                 res.status(201).json(journal);
             }
             catch (err) {
@@ -29,26 +29,29 @@ class JournalController {
             }
         });
     }
-    // 📖 Récupérer le journal de l'utilisateur connecté
-    static me(req, res) {
+    // 📖 Récupérer toutes les entrées du journal de l'utilisateur connecté
+    static list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const user = req.user;
-                const entry = yield Journal_service_1.JournalService.getUserJournal(user.id);
-                res.json(entry);
+                const entries = yield Journal_service_1.JournalService.getUserEntries(user.id);
+                res.json(entries);
             }
             catch (err) {
                 res.status(400).json({ error: err.message });
             }
         });
     }
-    // ✏️ Modifier le journal de l'utilisateur
+    // ✏️ Modifier une entrée spécifique par ID
     static update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const user = req.user;
+                const { id } = req.params;
                 const { contenu } = req.body;
-                const updated = yield Journal_service_1.JournalService.updateUserJournal(user.id, contenu);
+                if (!id || typeof contenu !== "string") {
+                    return res.status(400).json({ error: "ID et contenu requis" });
+                }
+                const updated = yield Journal_service_1.JournalService.updateEntry(id, contenu);
                 res.json(updated);
             }
             catch (err) {
@@ -56,13 +59,16 @@ class JournalController {
             }
         });
     }
-    // ❌ Supprimer le journal de l'utilisateur
+    // ❌ Supprimer une entrée spécifique par ID
     static remove(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const user = req.user;
-                yield Journal_service_1.JournalService.deleteUserJournal(user.id);
-                res.json({ message: "Journal supprimé" });
+                const { id } = req.params;
+                if (!id) {
+                    return res.status(400).json({ error: "ID requis" });
+                }
+                yield Journal_service_1.JournalService.deleteEntry(id);
+                res.json({ message: "Entrée supprimée" });
             }
             catch (err) {
                 res.status(400).json({ error: err.message });

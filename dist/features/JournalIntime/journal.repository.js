@@ -15,35 +15,38 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JournalRepository = void 0;
 const client_1 = __importDefault(require("../../shared/database/client"));
 class JournalRepository {
-    // Créer ou mettre à jour le journal d'un utilisateur (1 journal par utilisateur)
-    static createOrUpdate(utilisateurId, contenu) {
+    // ➤ Créer une nouvelle entrée dans le journal
+    static create(utilisateurId, contenu) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield client_1.default.query(`INSERT INTO journal (utilisateur_id, contenu)
        VALUES ($1, $2)
-       ON CONFLICT (utilisateur_id)
-       DO UPDATE SET contenu = EXCLUDED.contenu
        RETURNING *`, [utilisateurId, contenu]);
             return result.rows[0];
         });
     }
-    // Récupérer le journal d’un utilisateur
+    // ➤ Récupérer toutes les entrées d’un utilisateur (ordre chronologique inverse)
     static findByUser(utilisateurId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield client_1.default.query(`SELECT * FROM journal WHERE utilisateur_id = $1`, [utilisateurId]);
+            const result = yield client_1.default.query(`SELECT * FROM journal
+       WHERE utilisateur_id = $1
+       ORDER BY date_creation DESC`, [utilisateurId]);
+            return result.rows;
+        });
+    }
+    // ➤ Mettre à jour une entrée spécifique par son id
+    static updateById(id, contenu) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield client_1.default.query(`UPDATE journal
+       SET contenu = $2
+       WHERE id = $1
+       RETURNING *`, [id, contenu]);
             return result.rows[0] || null;
         });
     }
-    // Mettre à jour le journal par utilisateur
-    static updateByUser(utilisateurId, contenu) {
+    // ➤ Supprimer une entrée spécifique
+    static deleteById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield client_1.default.query(`UPDATE journal SET contenu = $2 WHERE utilisateur_id = $1 RETURNING *`, [utilisateurId, contenu]);
-            return result.rows[0] || null;
-        });
-    }
-    // Supprimer le journal par utilisateur
-    static deleteByUser(utilisateurId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield client_1.default.query(`DELETE FROM journal WHERE utilisateur_id = $1`, [utilisateurId]);
+            yield client_1.default.query(`DELETE FROM journal WHERE id = $1`, [id]);
         });
     }
 }

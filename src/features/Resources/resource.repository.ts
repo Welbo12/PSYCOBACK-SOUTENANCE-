@@ -82,13 +82,10 @@
 
 // export default new ResourceRepository();
 
-import { Pool } from 'pg';
 import { Resource } from './resource.model';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
+import pool from '../../shared/database/client';
 // ✅ Création
 export const createResource = async (
   data: Omit<Resource, 'id' | 'createdAt' | 'updatedAt'>

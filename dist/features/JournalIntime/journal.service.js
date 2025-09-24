@@ -10,40 +10,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JournalService = void 0;
-// src/modules/journal/Journal.service.tsrepository
+// src/modules/journal/Journal.service.ts
 const Journal_repository_1 = require("./Journal.repository");
 const Auth_repository_1 = require("../auth/Auth.repository"); // pour vérifier si user existe
 class JournalService {
-    //  Créer/MàJ le journal de l'utilisateur (un seul journal par user)
-    static upsertUserJournal(utilisateurId, contenu) {
+    // ➤ Créer une nouvelle entrée de journal
+    static createEntry(utilisateurId, contenu) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Vérifier si l'utilisateur existe via son id
-            const exists = yield Auth_repository_1.AuthRepository.findAllUsers();
-            const found = exists.find((u) => u.id === utilisateurId);
+            // Vérifier si l'utilisateur existe
+            const users = yield Auth_repository_1.AuthRepository.findAllUsers();
+            const found = users.find((u) => u.id === utilisateurId);
             if (!found)
                 throw new Error("Utilisateur introuvable");
-            return yield Journal_repository_1.JournalRepository.createOrUpdate(utilisateurId, contenu);
+            return yield Journal_repository_1.JournalRepository.create(utilisateurId, contenu);
         });
     }
-    //  Récupérer le journal de l’utilisateur
-    static getUserJournal(utilisateurId) {
+    // ➤ Récupérer toutes les entrées d’un utilisateur
+    static getUserEntries(utilisateurId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield Journal_repository_1.JournalRepository.findByUser(utilisateurId);
         });
     }
-    //  Modifier le journal (par utilisateur)
-    static updateUserJournal(utilisateurId, contenu) {
+    // ➤ Modifier une entrée spécifique
+    static updateEntry(id, contenu) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updated = yield Journal_repository_1.JournalRepository.updateByUser(utilisateurId, contenu);
+            const updated = yield Journal_repository_1.JournalRepository.updateById(id, contenu);
             if (!updated)
-                throw new Error("Journal introuvable");
+                throw new Error("Entrée introuvable");
             return updated;
         });
     }
-    //  Supprimer le journal de l’utilisateur
-    static deleteUserJournal(utilisateurId) {
+    // ➤ Supprimer une entrée spécifique
+    static deleteEntry(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield Journal_repository_1.JournalRepository.deleteByUser(utilisateurId);
+            return yield Journal_repository_1.JournalRepository.deleteById(id);
         });
     }
 }

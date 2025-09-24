@@ -44,7 +44,7 @@ app.get("/healthCheck", (req: Request, res: Response) => {
 });
 
 app.use("/api/auth",  AuthRoutes);
-app.use("/api/resources", ResourceRoutes);
+
 
 app.listen(PORT, () => {
   console.log("le serveur est lancé sur le port : " + API_URL);
