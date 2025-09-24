@@ -54,3 +54,4 @@ app.listen(PORT, () => {
 app.use("/api/Journal", JournalRoutes);
 app.use("/api/device", DeviceRoutes);
 app.use("/api/emergency", EmergencieRoutes);
+app.use("/api/resources", ResourceRoutes);
