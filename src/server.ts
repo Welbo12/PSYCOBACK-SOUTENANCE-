@@ -3,10 +3,15 @@ import { Request, Response } from "express";
 import pool from "./shared/database/client";
 import AuthRoutes from "./features/auth/Auth.routes";
 import JournalRoutes from "./features/JournalIntime/Journal.routes";
+import DeviceRoutes from "./features/Notification/Device/Device.routes";
+import EmergencieRoutes from "./features/Notification/Emergencie/Emergencie.routes";
+import ResourceRoutes from "./features/Resources/resource.route";
+import cors from "cors";
 
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const PORT = 3000;
 const API_URL = "http://localhost:3000";
@@ -39,6 +44,7 @@ app.get("/healthCheck", (req: Request, res: Response) => {
 });
 
 app.use("/api/auth",  AuthRoutes);
+app.use("/api/resources", ResourceRoutes);
 
 app.listen(PORT, () => {
   console.log("le serveur est lancé sur le port : " + API_URL);
@@ -46,3 +52,5 @@ app.listen(PORT, () => {
 
 
 app.use("/api/Journal", JournalRoutes);
+app.use("/api/device", DeviceRoutes);
+app.use("/api/emergency", EmergencieRoutes);
