@@ -7,6 +7,7 @@ import DeviceRoutes from "./features/Notification/Device/Device.routes";
 import EmergencieRoutes from "./features/Notification/Emergencie/Emergencie.routes";
 import ResourceRoutes from "./features/Resources/resource.route";
 import cors from "cors";
+import { createAdmin } from "./shared/script/createAdmin";
 
 
 const app = express();
@@ -41,6 +42,15 @@ app.get("/healthCheck", (req: Request, res: Response) => {
     timeStamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
+});
+app.post("/create-admin", async (req, res) => {
+  const { email, password, pseudonyme } = req.body;
+  try {
+    const admin = await createAdmin(email, password, pseudonyme);
+    res.json({ message: "Admin créé", admin });
+  } catch (err) {
+    res.status(500).json({ error: "Erreur création admin" });
+  }
 });
 
 app.use("/api/auth",  AuthRoutes);
