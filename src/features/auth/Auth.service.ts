@@ -156,6 +156,20 @@ export class RegisterPatientService {
     if (!isPasswordValid) {
       throw new Error("Mot de passe incorrect");
     }
+    
+    // Bloquer la connexion si psychologue non approuvé
+    // if (user.role === "psychologue") {
+    //   const r = await pool.query(
+    //     "SELECT statutverification FROM psychologue WHERE id = $1",
+    //     [user.id]
+    //   );
+    //   if (!r.rows[0]?.statutverification) {
+    //     const err: any = new Error("Votre compte est en attente de validation.");
+    //     err.code = "PENDING_APPROVAL";
+    //     throw err;
+    //   }
+    // }
+
 
     return user;
   }
@@ -281,5 +295,9 @@ export class RegisterPatientService {
     const user = await AuthRepository.findByClearEmail(email_clair);
     if (!user) throw new Error("Utilisateur introuvable");
     return this.resetPasswordAfterOTP(user.id as string, otp, newPassword);
+  }
+   // Statistiques: nombre de patients
+  static async countPatients(): Promise<number> {
+    return AuthRepository.countPatients();
   }
 }

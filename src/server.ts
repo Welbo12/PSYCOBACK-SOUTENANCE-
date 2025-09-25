@@ -114,12 +114,12 @@ app.use("/api/device", DeviceRoutes);
 app.use("/api/emergency", EmergencieRoutes);
 app.use("/api/resources", ResourceRoutes);
 
-// ⚡ Démarrage serveur avec création automatique de l’admin
+//  Démarrage serveur avec création automatique de l’admin
 async function startServer() {
   await ensureAdmin(); // crée ou récupère l’admin avant de lancer le serveur
 
   app.listen(PORT, () => {
-    console.log("🚀 Le serveur est lancé sur le port : " + API_URL);
+    console.log(" Le serveur est lancé sur le port : " + API_URL);
   });
 }
 

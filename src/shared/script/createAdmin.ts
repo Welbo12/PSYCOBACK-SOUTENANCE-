@@ -149,14 +149,14 @@ if (require.main === module) {
   createAdmin(email, password, pseudonyme)
     .then((admin) => {
       if (admin.alreadyExisted) {
-        console.log(`✅ Admin déjà existant : ${admin.email_clair}`);
+        console.log(` Admin déjà existant : ${admin.email_clair}`);
       } else {
-        console.log(`🎉 Nouvel admin créé : ${admin.email_clair}`);
+        console.log(`Nouvel admin créé : ${admin.email_clair}`);
       }
       process.exit(0);
     })
     .catch((e) => {
-      console.error("❌ Erreur création admin:", e);
+      console.error("Erreur création admin:", e);
       process.exit(1);
     });
 }
