@@ -59,6 +59,15 @@ export class AuthRepository {
     );
     return result.rows[0]?.count ?? 0;
   }
+ // -----------------------------
+  // Compter les psychologues (role = 'psychologue')
+  // -----------------------------
+  static async countPsychologues(): Promise<number> {
+    const result = await pool.query(
+      `SELECT COUNT(*)::int AS count FROM utilisateur WHERE role = 'psychologue'`
+    );
+    return result.rows[0]?.count ?? 0;
+  }
 
 
   // -----------------------------

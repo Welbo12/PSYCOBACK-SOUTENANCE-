@@ -300,4 +300,8 @@ export class RegisterPatientService {
   static async countPatients(): Promise<number> {
     return AuthRepository.countPatients();
   }
+    // Statistiques: nombre de psychologues
+  static async countPsychologues(): Promise<number> {
+    return AuthRepository.countPsychologues();
+  }
 }

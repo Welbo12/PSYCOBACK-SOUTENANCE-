@@ -405,6 +405,17 @@ export class RegisterPatientController {
       res.status(500).json({ error: "Erreur lors du comptage des patients" });
     }
   }
+    // ----------------------------
+  // 4️⃣ Nombre total de psychologues
+  // ----------------------------
+  static async countPsychologues(req: Request, res: Response) {
+    try {
+      const count = await RegisterPatientService.countPsychologues();
+      res.status(200).json({ count });
+    } catch (err: any) {
+      res.status(500).json({ error: "Erreur lors du comptage des psychologues" });
+    }
+  }
 }
 
 

@@ -7,6 +7,7 @@ const router = Router();
 router.post("/register/patient", RegisterPatientController.registerPatient);
 router.post("/login", RegisterPatientController.login);
    router.get("/patients/count", RegisterPatientController.countPatients);
+   router.get("/psychologues/count", RegisterPatientController.countPsychologues);
 router.post("/loginByClearEmail", RegisterPatientController.loginByClearEmail);
 router.post("/request-otp", RegisterPatientController.requestOTP);
 
