@@ -52,6 +52,15 @@ app.get("/healthCheck", (req, res) => {
         uptime: process.uptime(),
     });
 });
+// app.post("/create-admin", async (req, res) => {
+//   const { email, password, pseudonyme } = req.body;
+//   try {
+//     const admin = await createAdmin(email, password, pseudonyme);
+//     res.json({ message: "Admin créé", admin });
+//   } catch (err) {
+//     res.status(500).json({ error: "Erreur création admin" });
+//   }
+// });
 app.use("/api/auth", Auth_routes_1.default);
 app.listen(PORT, () => {
     console.log("le serveur est lancé sur le port : " + API_URL);

@@ -1,7 +1,7 @@
 "use strict";
-// import { Router } from 'express';
-// import controller from './resource.controller';
-// import { createUploadSignature } from '../../shared/utils/cloudinary.js';
+// // import { Router } from 'express';
+// // import controller from './resource.controller';
+// // import { createUploadSignature } from '../../shared/utils/cloudinary.js';
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -36,27 +36,47 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+// // const router = Router();
+// // router.get('/', (req, res) => controller.list(req, res));
+// // router.post('/', (req, res) => controller.create(req, res));
+// // // Endpoint pour récupérer une signature d'upload Cloudinary côté client
+// // router.get('/upload/signature', (req, res) => {
+// // 	try {
+// // 		const folder = (req.query.folder as string) || undefined;
+// // 		const payload = createUploadSignature({ folder });
+// // 		res.json(payload);
+// // 	} catch (err: any) {
+// // 		res.status(500).json({ error: err.message || 'Signature error' });
+// // 	}
+// // });
+// // router.get('/:id', (req, res) => controller.get(req, res));
+// // router.put('/:id', (req, res) => controller.update(req, res));
+// // router.delete('/:id', (req, res) => controller.remove(req, res));
+// // export default router;
+// // src/routes/resource.routes.ts
+// import { Router } from 'express';
+// import * as resourceController from './resource.controller';
 // const router = Router();
-// router.get('/', (req, res) => controller.list(req, res));
-// router.post('/', (req, res) => controller.create(req, res));
-// // Endpoint pour récupérer une signature d'upload Cloudinary côté client
-// router.get('/upload/signature', (req, res) => {
-// 	try {
-// 		const folder = (req.query.folder as string) || undefined;
-// 		const payload = createUploadSignature({ folder });
-// 		res.json(payload);
-// 	} catch (err: any) {
-// 		res.status(500).json({ error: err.message || 'Signature error' });
-// 	}
-// });
-// router.get('/:id', (req, res) => controller.get(req, res));
-// router.put('/:id', (req, res) => controller.update(req, res));
-// router.delete('/:id', (req, res) => controller.remove(req, res));
+// router.post('/', resourceController.createResource);
+// router.get('/', resourceController.getResources);
+// router.get('/:id', resourceController.getResourceById);
+// router.put('/:id', resourceController.updateResource);
+// router.delete('/:id', resourceController.deleteResource);
 // export default router;
-// src/routes/resource.routes.ts
 const express_1 = require("express");
 const resourceController = __importStar(require("./resource.controller"));
+const cloudinary_1 = require("../../shared/utils/cloudinary");
 const router = (0, express_1.Router)();
+router.get('/upload/signature', (req, res) => {
+    try {
+        const folder = req.query.folder || undefined;
+        const payload = (0, cloudinary_1.createUploadSignature)({ folder });
+        res.json(payload);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message || 'Signature error' });
+    }
+});
 router.post('/', resourceController.createResource);
 router.get('/', resourceController.getResources);
 router.get('/:id', resourceController.getResourceById);
