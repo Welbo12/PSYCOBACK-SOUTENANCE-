@@ -43,15 +43,15 @@ app.get("/healthCheck", (req: Request, res: Response) => {
     uptime: process.uptime(),
   });
 });
-app.post("/create-admin", async (req, res) => {
-  const { email, password, pseudonyme } = req.body;
-  try {
-    const admin = await createAdmin(email, password, pseudonyme);
-    res.json({ message: "Admin créé", admin });
-  } catch (err) {
-    res.status(500).json({ error: "Erreur création admin" });
-  }
-});
+// app.post("/create-admin", async (req, res) => {
+//   const { email, password, pseudonyme } = req.body;
+//   try {
+//     const admin = await createAdmin(email, password, pseudonyme);
+//     res.json({ message: "Admin créé", admin });
+//   } catch (err) {
+//     res.status(500).json({ error: "Erreur création admin" });
+//   }
+// });
 
 app.use("/api/auth",  AuthRoutes);
 
