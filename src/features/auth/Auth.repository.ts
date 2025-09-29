@@ -109,11 +109,11 @@ export class AuthRepository {
     );
 
      // Créer l'entrée Psychologue avec statutVerification = FALSE par défaut
-    // await pool.query(
-    //   `INSERT INTO psychologue (id, statutverification, disponibilite)
-    //    VALUES ($1, FALSE, TRUE)`,
-    //   [user.id]
-    // );
+    await pool.query(
+      `INSERT INTO psychologue (id, statutverification, disponibilite)
+       VALUES ($1, FALSE, TRUE)`,
+      [user.id]
+    );
     return user;
   }
 

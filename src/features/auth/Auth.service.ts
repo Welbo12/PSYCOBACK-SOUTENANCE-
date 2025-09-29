@@ -158,17 +158,17 @@ export class RegisterPatientService {
     }
     
     // Bloquer la connexion si psychologue non approuvé
-    // if (user.role === "psychologue") {
-    //   const r = await pool.query(
-    //     "SELECT statutverification FROM psychologue WHERE id = $1",
-    //     [user.id]
-    //   );
-    //   if (!r.rows[0]?.statutverification) {
-    //     const err: any = new Error("Votre compte est en attente de validation.");
-    //     err.code = "PENDING_APPROVAL";
-    //     throw err;
-    //   }
-    // }
+    if (user.role === "psychologue") {
+      const r = await pool.query(
+        "SELECT statutverification FROM psychologue WHERE id = $1",
+        [user.id]
+      );
+      if (!r.rows[0]?.statutverification) {
+        const err: any = new Error("Votre compte est en attente de validation.");
+        err.code = "PENDING_APPROVAL";
+        throw err;
+      }
+    }
 
 
     return user;
