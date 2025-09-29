@@ -164,6 +164,43 @@ export class AuthRepository {
     );
   }
 
+  // -----------------------------
+  // 7️⃣ Lister les candidatures psychologues
+  // -----------------------------
+  static async listPsychologistApplications() {
+    const result = await pool.query(
+      `SELECT 
+         u.id,
+         u.nom,
+         u.prenom,
+         u.email_clair,
+         u.datecreation as "dateCreation",
+         p.statutverification as "statutVerification",
+         tp.domaines,
+         tp.sujets,
+         tp.methodes,
+         tp.description,
+         tp.motivation,
+         tp.cv_url as "cvUrl"
+       FROM utilisateur u
+       JOIN psychologue p ON p.id = u.id
+       LEFT JOIN therapist_profile tp ON tp.user_id = u.id
+       WHERE u.role = 'psychologue'
+       ORDER BY u.datecreation DESC`
+    );
+    return result.rows;
+  }
+
+  // -----------------------------
+  // 8️⃣ Approuver un psychologue (statutverification = TRUE)
+  // -----------------------------
+  static async approvePsychologist(userId: string) {
+    await pool.query(
+      `UPDATE psychologue SET statutverification = TRUE WHERE id = $1`,
+      [userId]
+    );
+  }
+
 
 
 }

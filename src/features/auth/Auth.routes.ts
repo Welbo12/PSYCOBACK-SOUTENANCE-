@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { RegisterPatientController } from "./Auth.controller";
+import { RegisterPatientController, PsychologistApplicationsController } from "./Auth.controller";
 import { authenticate } from "../../shared/middlewares/authMiddleware";
 
 const router = Router();
@@ -22,5 +22,9 @@ router.post(
   "/register/psychologue",
   RegisterPatientController.registerPsychologue
 );
+
+// Psychologist applications
+router.get("/psychologues/applications", PsychologistApplicationsController.list);
+router.post("/psychologues/:id/approve", PsychologistApplicationsController.approve);
 
 export default router;

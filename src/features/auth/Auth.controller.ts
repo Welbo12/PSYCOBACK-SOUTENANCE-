@@ -418,4 +418,31 @@ export class RegisterPatientController {
   }
 }
 
+// ----------------------------
+// 5️⃣ Candidatures psychologues: liste + approbation
+// ----------------------------
+export class PsychologistApplicationsController {
+  static async list(req: Request, res: Response) {
+    try {
+      const rows = await RegisterPatientService.listPsychologistApplications();
+      res.status(200).json(rows);
+    } catch (err: any) {
+      res.status(500).json({ error: "Erreur lors du chargement des candidatures" });
+    }
+  }
+
+  static async approve(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      if (!id) return res.status(400).json({ error: "Paramètre id manquant" });
+      const result = await RegisterPatientService.approvePsychologist(id);
+      res.status(200).json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || "Impossible d'approuver" });
+    }
+  }
+}
+
+
+
 

@@ -304,4 +304,19 @@ export class RegisterPatientService {
   static async countPsychologues(): Promise<number> {
     return AuthRepository.countPsychologues();
   }
+  // ----------------------------
+  // 9️⃣ Lister candidatures psychologues
+  // ----------------------------
+  static async listPsychologistApplications() {
+    return AuthRepository.listPsychologistApplications();
+  }
+
+  // ----------------------------
+  // 🔟 Approuver un psychologue
+  // ----------------------------
+  static async approvePsychologist(userId: string) {
+    if (!userId) throw new Error("Identifiant utilisateur manquant");
+    await AuthRepository.approvePsychologist(userId);
+    return { message: "Psychologue approuvé" };
+  }
 }
