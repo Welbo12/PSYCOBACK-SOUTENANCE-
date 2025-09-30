@@ -90,7 +90,8 @@ export class AuthRepository {
     methodes: string[],
     description: string,
     motivation: string,
-    cvUrl?: string
+     cvUrl?: string,
+    photoUrl?: string
   ) {
     // Créer l'utilisateur psychologue
     const userResult = await pool.query(
@@ -103,9 +104,9 @@ export class AuthRepository {
 
     // Créer le profil
     await pool.query(
-      `INSERT INTO therapist_profile (user_id, domaines, sujets, methodes, description, motivation, cv_url)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [user.id, domaines, sujets, methodes, description, motivation, cvUrl || null]
+      `INSERT INTO therapist_profile (user_id, domaines, sujets, methodes, description, motivation, cv_url, photo_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [user.id, domaines, sujets, methodes, description, motivation, cvUrl || null, photoUrl || null]
     );
 
      // Créer l'entrée Psychologue avec statutVerification = FALSE par défaut
@@ -181,7 +182,8 @@ export class AuthRepository {
          tp.methodes,
          tp.description,
          tp.motivation,
-         tp.cv_url as "cvUrl"
+         tp.cv_url as "cvUrl",
+         tp.photo_url as "photoUrl"
        FROM utilisateur u
        JOIN psychologue p ON p.id = u.id
        LEFT JOIN therapist_profile tp ON tp.user_id = u.id

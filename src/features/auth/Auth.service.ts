@@ -108,7 +108,8 @@ export class RegisterPatientService {
     methodes: string[],
     description: string,
     motivation: string,
-    cvUrl?: string
+      cvUrl?: string,
+    photoUrl?: string
   ): Promise<IUser> {
     if (!nom || !prenom || !motDePasse || !email_clair) {
       throw new Error("Champs obligatoires manquants");
@@ -134,7 +135,8 @@ export class RegisterPatientService {
       methodes,
       description,
       motivation,
-      cvUrl
+      cvUrl,
+      photoUrl
     );
 
     return user;

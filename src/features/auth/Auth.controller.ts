@@ -270,7 +270,7 @@ export class RegisterPatientController {
   // ----------------------------
   static async registerPsychologue(req: Request, res: Response) {
     try {
-      const { nom, prenom, motDePasse, email_clair, domaines, sujets, methodes, description, motivation, cvUrl } = req.body;
+       const { nom, prenom, motDePasse, email_clair, domaines, sujets, methodes, description, motivation, cvUrl, photoUrl } = req.body;
 
       if (!nom || !prenom || !motDePasse || !email_clair) {
         return res.status(400).json({ error: "Champs obligatoires manquants" });
@@ -286,7 +286,8 @@ export class RegisterPatientController {
         methodes || [],
         description || "",
         motivation || "",
-        cvUrl
+       cvUrl,
+        photoUrl
       );
 
       res.status(201).json({ message: "Psychologue enregistré avec succès", data: user });
