@@ -87,7 +87,7 @@ class RegisterPatientService {
     // ----------------------------
     // 3️⃣ Enregistrement psychologue
     // ----------------------------
-    static registerPsychologue(nom, prenom, motDePasse, email_clair, domaines, sujets, methodes, description, motivation, cvUrl) {
+    static registerPsychologue(nom, prenom, motDePasse, email_clair, domaines, sujets, methodes, description, motivation, cvUrl, photoUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!nom || !prenom || !motDePasse || !email_clair) {
                 throw new Error("Champs obligatoires manquants");
@@ -100,7 +100,7 @@ class RegisterPatientService {
             // Hash mot de passe
             const hashedPassword = yield (0, hashUtils_1.hashPassword)(motDePasse);
             // Création en BDD ( pas de pseudonyme ici)
-            const user = yield Auth_repository_1.AuthRepository.createPsychologue(nom, prenom, hashedPassword, email_clair, domaines, sujets, methodes, description, motivation, cvUrl);
+            const user = yield Auth_repository_1.AuthRepository.createPsychologue(nom, prenom, hashedPassword, email_clair, domaines, sujets, methodes, description, motivation, cvUrl, photoUrl);
             return user;
         });
     }
@@ -109,6 +109,7 @@ class RegisterPatientService {
     // ----------------------------
     static loginByClearEmail(email_clair, motDePasse) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const user = yield Auth_repository_1.AuthRepository.findByClearEmail(email_clair);
             if (!user) {
                 throw new Error("Utilisateur introuvable");
@@ -116,6 +117,15 @@ class RegisterPatientService {
             const isPasswordValid = yield (0, hashUtils_1.comparePassword)(motDePasse, user.motDePasse);
             if (!isPasswordValid) {
                 throw new Error("Mot de passe incorrect");
+            }
+            // Bloquer la connexion si psychologue non approuvé
+            if (user.role === "psychologue") {
+                const r = yield client_1.default.query("SELECT statutverification FROM psychologue WHERE id = $1", [user.id]);
+                if (!((_a = r.rows[0]) === null || _a === void 0 ? void 0 : _a.statutverification)) {
+                    const err = new Error("Votre compte est en attente de validation.");
+                    err.code = "PENDING_APPROVAL";
+                    throw err;
+                }
             }
             return user;
         });
@@ -219,6 +229,37 @@ class RegisterPatientService {
             if (!user)
                 throw new Error("Utilisateur introuvable");
             return this.resetPasswordAfterOTP(user.id, otp, newPassword);
+        });
+    }
+    // Statistiques: nombre de patients
+    static countPatients() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Auth_repository_1.AuthRepository.countPatients();
+        });
+    }
+    // Statistiques: nombre de psychologues
+    static countPsychologues() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Auth_repository_1.AuthRepository.countPsychologues();
+        });
+    }
+    // ----------------------------
+    // 9️⃣ Lister candidatures psychologues
+    // ----------------------------
+    static listPsychologistApplications() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Auth_repository_1.AuthRepository.listPsychologistApplications();
+        });
+    }
+    // ----------------------------
+    // 🔟 Approuver un psychologue
+    // ----------------------------
+    static approvePsychologist(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!userId)
+                throw new Error("Identifiant utilisateur manquant");
+            yield Auth_repository_1.AuthRepository.approvePsychologist(userId);
+            return { message: "Psychologue approuvé" };
         });
     }
 }

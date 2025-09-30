@@ -1,4 +1,13 @@
 "use strict";
+// import express from "express";
+// import { Request, Response } from "express";
+// import pool from "./shared/database/client";
+// import AuthRoutes from "./features/auth/Auth.routes";
+// import JournalRoutes from "./features/JournalIntime/Journal.routes";
+// import DeviceRoutes from "./features/Notification/Device/Device.routes";
+// import EmergencieRoutes from "./features/Notification/Emergencie/Emergencie.routes";
+// import ResourceRoutes from "./features/Resources/resource.route";
+// import cors from "cors";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,6 +21,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// const app = express();
+// app.use(express.json());
+// app.use(cors());
+// const PORT = 3000;
+// const API_URL = "http://localhost:3000";
+// app.get("/", (req: Request, res: Response) => {
+//   res.send("Juste un simple serveur express avec TypeScript !");
+// });
+// app.get("/test",  async function(req: Request, res: Response)  {
+//     try {
+//         const result = await pool.query('SELECT NOW() as now;');
+//         res.status(200).json({
+//             message:"l'heure actuelle dans la base de données est : " + result.rows[0].now,
+//             timeStamp: new Date().toISOString(),
+//             uptime: process.uptime(),});
+//     }
+//     catch (err) {
+//         res.status(500).json({ error: "Internal server error" });
+//         console.error(err);
+//     }
+// });
+// app.get("/healthCheck", (req: Request, res: Response) => {
+//   res.status(200).json({
+//     status: "ok",
+//     message: "Serveur en ligne",
+//     timeStamp: new Date().toISOString(),
+//     uptime: process.uptime(),
+//   });
+// });
+// app.use("/api/auth",  AuthRoutes);
+// app.listen(PORT, () => {
+//   console.log("le serveur est lancé sur le port : " + API_URL);
+// });
+// app.use("/api/Journal", JournalRoutes);
+// app.use("/api/device", DeviceRoutes);
+// app.use("/api/emergency", EmergencieRoutes);
+// app.use("/api/resources", ResourceRoutes);
 const express_1 = __importDefault(require("express"));
 const client_1 = __importDefault(require("./shared/database/client"));
 const Auth_routes_1 = __importDefault(require("./features/auth/Auth.routes"));
@@ -20,11 +66,14 @@ const Device_routes_1 = __importDefault(require("./features/Notification/Device/
 const Emergencie_routes_1 = __importDefault(require("./features/Notification/Emergencie/Emergencie.routes"));
 const resource_route_1 = __importDefault(require("./features/Resources/resource.route"));
 const cors_1 = __importDefault(require("cors"));
+// Importer la fonction
+const runCreateAdmin_1 = require("./shared/script/runCreateAdmin");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 const PORT = 3000;
 const API_URL = "http://localhost:3000";
+// Routes publiques
 app.get("/", (req, res) => {
     res.send("Juste un simple serveur express avec TypeScript !");
 });
@@ -52,20 +101,19 @@ app.get("/healthCheck", (req, res) => {
         uptime: process.uptime(),
     });
 });
-// app.post("/create-admin", async (req, res) => {
-//   const { email, password, pseudonyme } = req.body;
-//   try {
-//     const admin = await createAdmin(email, password, pseudonyme);
-//     res.json({ message: "Admin créé", admin });
-//   } catch (err) {
-//     res.status(500).json({ error: "Erreur création admin" });
-//   }
-// });
+// Routes API
 app.use("/api/auth", Auth_routes_1.default);
-app.listen(PORT, () => {
-    console.log("le serveur est lancé sur le port : " + API_URL);
-});
 app.use("/api/Journal", Journal_routes_1.default);
 app.use("/api/device", Device_routes_1.default);
 app.use("/api/emergency", Emergencie_routes_1.default);
 app.use("/api/resources", resource_route_1.default);
+//  Démarrage serveur avec création automatique de l’admin
+function startServer() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield (0, runCreateAdmin_1.ensureAdmin)(); // crée ou récupère l’admin avant de lancer le serveur
+        app.listen(PORT, () => {
+            console.log(" Le serveur est lancé sur le port : " + API_URL);
+        });
+    });
+}
+startServer();
