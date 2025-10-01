@@ -420,6 +420,29 @@ export class RegisterPatientController {
       res.status(500).json({ error: "Erreur interne du serveur" });
     }
   }
+  
+  // ----------------------------
+  // Demande de suppression de compte (authentifié)
+  // ----------------------------
+  static async requestDeletion(req: Request, res: Response) {
+    try {
+      const user = (req as any).user;
+      const userId = user?.id;
+      const { password } = req.body as any;
+
+      if (!userId) return res.status(401).json({ error: "Non authentifié" });
+      if (!password) return res.status(400).json({ error: "Mot de passe requis" });
+
+      const result = await RegisterPatientService.requestAccountDeletion(userId, password);
+      res.status(200).json(result);
+    } catch (err: any) {
+      if (err.message === "Mot de passe incorrect") {
+        return res.status(400).json({ error: err.message });
+      }
+      res.status(500).json({ error: "Erreur interne du serveur" });
+    }
+  }
+
 
   // ----------------------------
   // 3️⃣ Nombre total de patients

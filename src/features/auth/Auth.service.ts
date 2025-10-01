@@ -80,6 +80,17 @@ export class RegisterPatientService {
       throw new Error("Utilisateur introuvable");
     }
 
+    // Si une suppression est planifiée et échue, bloquer
+    const del = await pool.query(
+      `SELECT delete_after FROM account_deletion_request WHERE user_id = $1`,
+      [user.id]
+    );
+    const scheduled = del.rows[0]?.delete_after as Date | undefined;
+    if (scheduled && new Date(scheduled) <= new Date()) {
+      throw new Error("Compte supprimé");
+    }
+
+
     if (!user.motDePasse) {
       throw new Error("Compte utilisateur invalide - mot de passe manquant");
     }
@@ -150,6 +161,19 @@ export class RegisterPatientService {
     if (!user) {
       throw new Error("Utilisateur introuvable");
     }
+      // Supprimé si la date est passée
+    const del = await pool.query(
+      `SELECT delete_after FROM account_deletion_request WHERE user_id = $1`,
+      [user.id]
+    );
+    const scheduled = del.rows[0]?.delete_after as Date | undefined;
+    if (scheduled && new Date(scheduled) <= new Date()) {
+      throw new Error("Compte supprimé");
+    }
+    if (!user.motDePasse) {
+      throw new Error("Compte désactivé");
+    }
+
 
     const isPasswordValid = await comparePassword(
       motDePasse,
@@ -334,6 +358,39 @@ export class RegisterPatientService {
     );
 
     return { message: "Mot de passe modifié avec succès" };
+  }
+
+  // ----------------------------
+  // 🗑️ Demande de suppression de compte (désactivation immédiate)
+  // ----------------------------
+  static async requestAccountDeletion(userId: string, password: string) {
+    if (!userId || !password) {
+      throw new Error("Champs obligatoires manquants");
+    }
+
+    const result = await pool.query(
+      `SELECT id, motdepasse as "motDePasse" FROM utilisateur WHERE id = $1`,
+      [userId]
+    );
+    const user = result.rows[0];
+    if (!user || !user.motDePasse) {
+      throw new Error("Utilisateur introuvable");
+    }
+
+    const ok = await comparePassword(password, user.motDePasse);
+    if (!ok) {
+      throw new Error("Mot de passe incorrect");
+    }
+
+    // Planifier la suppression à J+15 sans désactiver immédiatement l'accès
+    await pool.query(
+      `INSERT INTO account_deletion_request (user_id, delete_after)
+       VALUES ($1, NOW() + INTERVAL '3 minutes')
+       ON CONFLICT (user_id) DO UPDATE SET delete_after = EXCLUDED.delete_after`,
+      [userId]
+    );
+
+    return { message: "Suppression planifiée sous 15 jours. Le compte reste actif jusque-là." };
   }
 
    // Statistiques: nombre de patients

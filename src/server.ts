@@ -117,6 +117,13 @@ app.use("/api/resources", ResourceRoutes);
 //  Démarrage serveur avec création automatique de l’admin
 async function startServer() {
   await ensureAdmin(); // crée ou récupère l’admin avant de lancer le serveur
+// S'assurer que la table de planification de suppression existe
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS account_deletion_request (
+      user_id UUID PRIMARY KEY,
+      delete_after TIMESTAMP NOT NULL
+    );
+  `);
 
   app.listen(PORT, () => {
     console.log(" Le serveur est lancé sur le port : " + API_URL);

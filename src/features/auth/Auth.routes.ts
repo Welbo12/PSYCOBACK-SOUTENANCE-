@@ -19,7 +19,7 @@ router.post("/reset-password", RegisterPatientController.resetPassword);
 
 // Changer mot de passe (authentifié)
 router.post("/change-password", authenticate, RegisterPatientController.changePassword);
-
+router.post("/request-deletion", authenticate, RegisterPatientController.requestDeletion);
 
 router.post(
   "/register/psychologue",
