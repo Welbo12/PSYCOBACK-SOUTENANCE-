@@ -298,6 +298,44 @@ export class RegisterPatientService {
     if (!user) throw new Error("Utilisateur introuvable");
     return this.resetPasswordAfterOTP(user.id as string, otp, newPassword);
   }
+ // ----------------------------
+  // 🔐 Changer mot de passe (authentifié)
+  // ----------------------------
+  static async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string
+  ) {
+    if (!userId || !oldPassword || !newPassword) {
+      throw new Error("Champs obligatoires manquants");
+    }
+
+    // Récupérer l'utilisateur
+    const result = await pool.query(
+      `SELECT id, motdepasse as "motDePasse" FROM utilisateur WHERE id = $1`,
+      [userId]
+    );
+    const user = result.rows[0];
+    if (!user || !user.motDePasse) {
+      throw new Error("Utilisateur introuvable");
+    }
+
+    // Vérifier l'ancien mot de passe
+    const ok = await comparePassword(oldPassword, user.motDePasse);
+    if (!ok) {
+      throw new Error("Ancien mot de passe incorrect");
+    }
+
+    // Hasher le nouveau et mettre à jour
+    const hashed = await hashPassword(newPassword);
+    await pool.query(
+      `UPDATE utilisateur SET motdepasse = $1 WHERE id = $2`,
+      [hashed, userId]
+    );
+
+    return { message: "Mot de passe modifié avec succès" };
+  }
+
    // Statistiques: nombre de patients
   static async countPatients(): Promise<number> {
     return AuthRepository.countPatients();

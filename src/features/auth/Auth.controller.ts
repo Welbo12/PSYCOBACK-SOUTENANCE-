@@ -394,6 +394,32 @@ export class RegisterPatientController {
       res.status(500).json({ error: "Erreur interne du serveur" });
     }
   }
+// ----------------------------
+  // Changer mot de passe (authentifié)
+  // ----------------------------
+  static async changePassword(req: Request, res: Response) {
+    try {
+      const user = (req as any).user;
+      const userId = user?.id;
+      const { oldPassword, newPassword } = req.body as any;
+
+      if (!userId) return res.status(401).json({ error: "Non authentifié" });
+      if (!oldPassword || !newPassword) {
+        return res.status(400).json({ error: "Champs obligatoires manquants (oldPassword, newPassword)" });
+      }
+
+      const result = await RegisterPatientService.changePassword(userId, oldPassword, newPassword);
+      res.status(200).json(result);
+    } catch (err: any) {
+      if (err.message === "Ancien mot de passe incorrect") {
+        return res.status(400).json({ error: err.message });
+      }
+      if (err.message?.includes("Utilisateur introuvable")) {
+        return res.status(404).json({ error: err.message });
+      }
+      res.status(500).json({ error: "Erreur interne du serveur" });
+    }
+  }
 
   // ----------------------------
   // 3️⃣ Nombre total de patients

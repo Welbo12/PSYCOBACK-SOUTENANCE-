@@ -17,6 +17,9 @@ router.post("/verify-otp", RegisterPatientController.verifyOTP);
 // Reset password après vérification OTP
 router.post("/reset-password", RegisterPatientController.resetPassword);
 
+// Changer mot de passe (authentifié)
+router.post("/change-password", authenticate, RegisterPatientController.changePassword);
+
 
 router.post(
   "/register/psychologue",
