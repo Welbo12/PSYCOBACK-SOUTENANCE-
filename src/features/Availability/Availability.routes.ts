@@ -8,6 +8,9 @@ const router = Router();
 // GET public (consultation)
 router.get("/:providerId", AvailabilityController.list);
 
+// Route de test pour créer des données de test (temporaire)
+router.post("/test/:providerId", AvailabilityController.createTestData);
+
 // Routes protégées pour modification
 router.use(authenticate, authorizeRole(["psychologue", "admin"]));
 

@@ -22,7 +22,10 @@ export const AvailabilityService = {
   },
 
   async list(providerId: string) {
-    return AvailabilityRepository.listByProvider(providerId);
+    console.log(`🔍 Service: Recherche des créneaux pour providerId: ${providerId}`);
+    const result = await AvailabilityRepository.listByProvider(providerId);
+    console.log(`📊 Service: ${result.length} créneaux trouvés`);
+    return result;
   },
 
   async removeSlot(providerId: string, iso: string) {

@@ -21,6 +21,7 @@ export const AvailabilityRepository = {
   },
 
   async listByProvider(providerId: string): Promise<AvailabilitySlot[]> {
+    console.log(`🔍 Repository: Exécution de la requête pour providerId: ${providerId}`);
     const { rows } = await pool.query(
       `SELECT id, provider_id, slot_time, is_booked, created_at
        FROM availability_slots
@@ -28,6 +29,7 @@ export const AvailabilityRepository = {
        ORDER BY slot_time ASC`,
       [providerId]
     );
+    console.log(`📊 Repository: ${rows.length} lignes retournées par la base de données`);
     return rows as AvailabilitySlot[];
   },
 

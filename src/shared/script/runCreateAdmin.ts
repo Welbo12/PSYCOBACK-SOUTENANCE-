@@ -17,3 +17,4 @@ export async function ensureAdmin() {
     console.error('Erreur création admin au démarrage:', e);
   }
 }
+export default ensureAdmin;
