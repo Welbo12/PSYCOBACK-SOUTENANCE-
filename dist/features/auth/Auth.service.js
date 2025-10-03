@@ -57,6 +57,7 @@ class RegisterPatientService {
     // ----------------------------
     static login(email, motDePasse) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const users = yield Auth_repository_1.AuthRepository.findAllUsers();
             let user = null;
             for (const u of users) {
@@ -73,6 +74,12 @@ class RegisterPatientService {
             }
             if (!user) {
                 throw new Error("Utilisateur introuvable");
+            }
+            // Si une suppression est planifiée et échue, bloquer
+            const del = yield client_1.default.query(`SELECT delete_after FROM account_deletion_request WHERE user_id = $1`, [user.id]);
+            const scheduled = (_a = del.rows[0]) === null || _a === void 0 ? void 0 : _a.delete_after;
+            if (scheduled && new Date(scheduled) <= new Date()) {
+                throw new Error("Compte supprimé");
             }
             if (!user.motDePasse) {
                 throw new Error("Compte utilisateur invalide - mot de passe manquant");
@@ -109,10 +116,19 @@ class RegisterPatientService {
     // ----------------------------
     static loginByClearEmail(email_clair, motDePasse) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
+            var _a, _b;
             const user = yield Auth_repository_1.AuthRepository.findByClearEmail(email_clair);
             if (!user) {
                 throw new Error("Utilisateur introuvable");
+            }
+            // Supprimé si la date est passée
+            const del = yield client_1.default.query(`SELECT delete_after FROM account_deletion_request WHERE user_id = $1`, [user.id]);
+            const scheduled = (_a = del.rows[0]) === null || _a === void 0 ? void 0 : _a.delete_after;
+            if (scheduled && new Date(scheduled) <= new Date()) {
+                throw new Error("Compte supprimé");
+            }
+            if (!user.motDePasse) {
+                throw new Error("Compte désactivé");
             }
             const isPasswordValid = yield (0, hashUtils_1.comparePassword)(motDePasse, user.motDePasse);
             if (!isPasswordValid) {
@@ -121,7 +137,7 @@ class RegisterPatientService {
             // Bloquer la connexion si psychologue non approuvé
             if (user.role === "psychologue") {
                 const r = yield client_1.default.query("SELECT statutverification FROM psychologue WHERE id = $1", [user.id]);
-                if (!((_a = r.rows[0]) === null || _a === void 0 ? void 0 : _a.statutverification)) {
+                if (!((_b = r.rows[0]) === null || _b === void 0 ? void 0 : _b.statutverification)) {
                     const err = new Error("Votre compte est en attente de validation.");
                     err.code = "PENDING_APPROVAL";
                     throw err;
@@ -229,6 +245,55 @@ class RegisterPatientService {
             if (!user)
                 throw new Error("Utilisateur introuvable");
             return this.resetPasswordAfterOTP(user.id, otp, newPassword);
+        });
+    }
+    // ----------------------------
+    // 🔐 Changer mot de passe (authentifié)
+    // ----------------------------
+    static changePassword(userId, oldPassword, newPassword) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!userId || !oldPassword || !newPassword) {
+                throw new Error("Champs obligatoires manquants");
+            }
+            // Récupérer l'utilisateur
+            const result = yield client_1.default.query(`SELECT id, motdepasse as "motDePasse" FROM utilisateur WHERE id = $1`, [userId]);
+            const user = result.rows[0];
+            if (!user || !user.motDePasse) {
+                throw new Error("Utilisateur introuvable");
+            }
+            // Vérifier l'ancien mot de passe
+            const ok = yield (0, hashUtils_1.comparePassword)(oldPassword, user.motDePasse);
+            if (!ok) {
+                throw new Error("Ancien mot de passe incorrect");
+            }
+            // Hasher le nouveau et mettre à jour
+            const hashed = yield (0, hashUtils_1.hashPassword)(newPassword);
+            yield client_1.default.query(`UPDATE utilisateur SET motdepasse = $1 WHERE id = $2`, [hashed, userId]);
+            return { message: "Mot de passe modifié avec succès" };
+        });
+    }
+    // ----------------------------
+    // 🗑️ Demande de suppression de compte (désactivation immédiate)
+    // ----------------------------
+    static requestAccountDeletion(userId, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!userId || !password) {
+                throw new Error("Champs obligatoires manquants");
+            }
+            const result = yield client_1.default.query(`SELECT id, motdepasse as "motDePasse" FROM utilisateur WHERE id = $1`, [userId]);
+            const user = result.rows[0];
+            if (!user || !user.motDePasse) {
+                throw new Error("Utilisateur introuvable");
+            }
+            const ok = yield (0, hashUtils_1.comparePassword)(password, user.motDePasse);
+            if (!ok) {
+                throw new Error("Mot de passe incorrect");
+            }
+            // Planifier la suppression à J+15 sans désactiver immédiatement l'accès
+            yield client_1.default.query(`INSERT INTO account_deletion_request (user_id, delete_after)
+       VALUES ($1, NOW() + INTERVAL '3 minutes')
+       ON CONFLICT (user_id) DO UPDATE SET delete_after = EXCLUDED.delete_after`, [userId]);
+            return { message: "Suppression planifiée sous 15 jours. Le compte reste actif jusque-là." };
         });
     }
     // Statistiques: nombre de patients

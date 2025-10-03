@@ -111,6 +111,24 @@ app.use("/api/resources", resource_route_1.default);
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         yield (0, runCreateAdmin_1.ensureAdmin)(); // crée ou récupère l’admin avant de lancer le serveur
+        // S'assurer que la table de planification de suppression existe
+        yield client_1.default.query(`
+    CREATE TABLE IF NOT EXISTS account_deletion_request (
+      user_id UUID PRIMARY KEY,
+      delete_after TIMESTAMP NOT NULL
+    );
+  `);
+        // Table des disponibilités
+        yield client_1.default.query(`
+    CREATE TABLE IF NOT EXISTS availability_slots (
+      id SERIAL PRIMARY KEY,
+      provider_id VARCHAR(64) NOT NULL,
+      slot_time TIMESTAMP NOT NULL,
+      is_booked BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      UNIQUE(provider_id, slot_time)
+    );
+  `);
         app.listen(PORT, () => {
             console.log(" Le serveur est lancé sur le port : " + API_URL);
         });

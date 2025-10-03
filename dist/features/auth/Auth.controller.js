@@ -342,6 +342,59 @@ class RegisterPatientController {
         });
     }
     // ----------------------------
+    // Changer mot de passe (authentifié)
+    // ----------------------------
+    static changePassword(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const user = req.user;
+                const userId = user === null || user === void 0 ? void 0 : user.id;
+                const { oldPassword, newPassword } = req.body;
+                if (!userId)
+                    return res.status(401).json({ error: "Non authentifié" });
+                if (!oldPassword || !newPassword) {
+                    return res.status(400).json({ error: "Champs obligatoires manquants (oldPassword, newPassword)" });
+                }
+                const result = yield Auth_service_1.RegisterPatientService.changePassword(userId, oldPassword, newPassword);
+                res.status(200).json(result);
+            }
+            catch (err) {
+                if (err.message === "Ancien mot de passe incorrect") {
+                    return res.status(400).json({ error: err.message });
+                }
+                if ((_a = err.message) === null || _a === void 0 ? void 0 : _a.includes("Utilisateur introuvable")) {
+                    return res.status(404).json({ error: err.message });
+                }
+                res.status(500).json({ error: "Erreur interne du serveur" });
+            }
+        });
+    }
+    // ----------------------------
+    // Demande de suppression de compte (authentifié)
+    // ----------------------------
+    static requestDeletion(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = req.user;
+                const userId = user === null || user === void 0 ? void 0 : user.id;
+                const { password } = req.body;
+                if (!userId)
+                    return res.status(401).json({ error: "Non authentifié" });
+                if (!password)
+                    return res.status(400).json({ error: "Mot de passe requis" });
+                const result = yield Auth_service_1.RegisterPatientService.requestAccountDeletion(userId, password);
+                res.status(200).json(result);
+            }
+            catch (err) {
+                if (err.message === "Mot de passe incorrect") {
+                    return res.status(400).json({ error: err.message });
+                }
+                res.status(500).json({ error: "Erreur interne du serveur" });
+            }
+        });
+    }
+    // ----------------------------
     // 3️⃣ Nombre total de patients
     // ----------------------------
     static countPatients(req, res) {
