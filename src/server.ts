@@ -76,8 +76,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const PORT = 3000;
-const API_URL = "http://localhost:3000";
+// const PORT = 3000;
+// const API_URL = "http://localhost:3000";
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 // Routes publiques
 app.get("/", (req: Request, res: Response) => {
@@ -140,7 +141,9 @@ async function startServer() {
 
 
   app.listen(PORT, () => {
-    console.log(" Le serveur est lancé sur le port : " + API_URL);
+    // console.log(" Le serveur est lancé sur le port : " + API_URL);
+       console.log("🚀 Le serveur est lancé sur le port : " + PORT);
+  
   });
 }
 
