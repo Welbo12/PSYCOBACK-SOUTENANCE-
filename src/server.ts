@@ -114,6 +114,7 @@ app.use("/api/Journal", JournalRoutes);
 app.use("/api/device", DeviceRoutes);
 app.use("/api/emergency", EmergencieRoutes);
 app.use("/api/resources", ResourceRoutes);
+app.use("/api/availability", AvailabilityRoutes);
 
 //  Démarrage serveur avec création automatique de l’admin
 async function startServer() {
