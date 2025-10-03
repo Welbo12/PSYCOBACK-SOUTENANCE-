@@ -66,6 +66,7 @@ import JournalRoutes from "./features/JournalIntime/Journal.routes";
 import DeviceRoutes from "./features/Notification/Device/Device.routes";
 import EmergencieRoutes from "./features/Notification/Emergencie/Emergencie.routes";
 import ResourceRoutes from "./features/Resources/resource.route";
+import AvailabilityRoutes from "./features/Availability/Availability.routes";
 import cors from "cors";
 
 // Importer la fonction
@@ -124,6 +125,18 @@ async function startServer() {
       delete_after TIMESTAMP NOT NULL
     );
   `);
+    // Table des disponibilités
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS availability_slots (
+      id SERIAL PRIMARY KEY,
+      provider_id VARCHAR(64) NOT NULL,
+      slot_time TIMESTAMP NOT NULL,
+      is_booked BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      UNIQUE(provider_id, slot_time)
+    );
+  `);
+
 
   app.listen(PORT, () => {
     console.log(" Le serveur est lancé sur le port : " + API_URL);
