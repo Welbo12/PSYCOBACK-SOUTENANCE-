@@ -67,7 +67,10 @@ import DeviceRoutes from "./features/Notification/Device/Device.routes";
 import EmergencieRoutes from "./features/Notification/Emergencie/Emergencie.routes";
 import ResourceRoutes from "./features/Resources/resource.route";
 import AvailabilityRoutes from "./features/Availability/Availability.routes";
+import ChatRoutes from "./features/Chat/Chat.routes";
+import { ChatGateway } from "./features/Chat/Chat.gateway";
 import cors from "cors";
+
 
 // Importer la fonction
 import { ensureAdmin } from "./shared/script/runCreateAdmin";
@@ -116,6 +119,8 @@ app.use("/api/device", DeviceRoutes);
 app.use("/api/emergency", EmergencieRoutes);
 app.use("/api/resources", ResourceRoutes);
 app.use("/api/availability", AvailabilityRoutes);
+app.use("/api/chat", ChatRoutes);
+
 
 //  Démarrage serveur avec création automatique de l’admin
 async function startServer() {
