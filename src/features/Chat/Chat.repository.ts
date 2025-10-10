@@ -33,35 +33,65 @@ export class ChatRepository {
     return rows[0] || null;
   }
 
-  async getUserConversations(userId: string): Promise<Array<Conversation & { last_message?: Message; unread_count: number }>> {
-    const { rows } = await pool.query(`
-      SELECT DISTINCT c.*, 
-             m.text as last_message_text,
-             m.created_at as last_message_created_at,
-             m.sender_id as last_message_sender_id,
-             COALESCE(unread.count, 0) as unread_count
-      FROM conversations c
-      INNER JOIN conversation_participants cp ON c.id = cp.conversation_id
-      LEFT JOIN LATERAL (
-        SELECT text, created_at, sender_id
-        FROM messages 
-        WHERE conversation_id = c.id 
-        ORDER BY created_at DESC 
-        LIMIT 1
-      ) m ON true
-      LEFT JOIN (
-        SELECT conversation_id, COUNT(*) as count
-        FROM messages 
-        WHERE conversation_id IN (
-          SELECT conversation_id FROM conversation_participants WHERE user_id = $1
-        ) AND sender_id != $1 AND read_at IS NULL
-        GROUP BY conversation_id
-      ) unread ON c.id = unread.conversation_id
-      WHERE cp.user_id = $1
-      ORDER BY COALESCE(m.created_at, c.created_at) DESC
-    `, [userId]);
-    return rows;
-  }
+  // async getUserConversations(userId: string): Promise<Array<Conversation & { last_message?: Message; unread_count: number }>> {
+  //   const { rows } = await pool.query(`
+  //     SELECT DISTINCT c.*, 
+  //            m.text as last_message_text,
+  //            m.created_at as last_message_created_at,
+  //            m.sender_id as last_message_sender_id,
+  //            COALESCE(unread.count, 0) as unread_count
+  //     FROM conversations c
+  //     INNER JOIN conversation_participants cp ON c.id = cp.conversation_id
+  //     LEFT JOIN LATERAL (
+  //       SELECT text, created_at, sender_id
+  //       FROM messages 
+  //       WHERE conversation_id = c.id 
+  //       ORDER BY created_at DESC 
+  //       LIMIT 1
+  //     ) m ON true
+  //     LEFT JOIN (
+  //       SELECT conversation_id, COUNT(*) as count
+  //       FROM messages 
+  //       WHERE conversation_id IN (
+  //         SELECT conversation_id FROM conversation_participants WHERE user_id = $1
+  //       ) AND sender_id != $1 AND read_at IS NULL
+  //       GROUP BY conversation_id
+  //     ) unread ON c.id = unread.conversation_id
+  //     WHERE cp.user_id = $1
+  //     ORDER BY COALESCE(m.created_at, c.created_at) DESC
+  //   `, [userId]);
+  //   return rows;
+  // }
+async getUserConversations(userId: string) {
+  const { rows } = await pool.query(`
+    SELECT DISTINCT ON (c.id)
+           c.*,
+           m.text as last_message_text,
+           m.created_at as last_message_created_at,
+           m.sender_id as last_message_sender_id,
+           COALESCE(unread.count, 0) as unread_count
+    FROM conversations c
+    INNER JOIN conversation_participants cp ON c.id = cp.conversation_id
+    LEFT JOIN LATERAL (
+      SELECT text, created_at, sender_id
+      FROM messages 
+      WHERE conversation_id = c.id 
+      ORDER BY created_at DESC 
+      LIMIT 1
+    ) m ON true
+    LEFT JOIN (
+      SELECT conversation_id, COUNT(*) as count
+      FROM messages 
+      WHERE conversation_id IN (
+        SELECT conversation_id FROM conversation_participants WHERE user_id = $1
+      ) AND sender_id != $1 AND read_at IS NULL
+      GROUP BY conversation_id
+    ) unread ON c.id = unread.conversation_id
+    WHERE cp.user_id = $1
+    ORDER BY c.id, COALESCE(m.created_at, c.created_at) DESC
+  `, [userId]);
+  return rows;
+}
 
   // Participants
   async addParticipant(conversationId: string, userId: string, role: 'patient' | 'psychologue'): Promise<void> {
