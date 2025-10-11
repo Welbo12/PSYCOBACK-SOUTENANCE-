@@ -38,6 +38,8 @@ router.get('/conversations', chatController.getConversations.bind(chatController
 
 // Récupérer les messages d'une conversation
 router.get('/conversations/:conversationId/messages', chatController.getMessages.bind(chatController));
+// Envoyer un message dans une conversation
+router.post('/conversations/:conversationId/messages', chatController.sendMessage.bind(chatController));
 
 // Marquer une conversation comme lue
 router.post('/conversations/:conversationId/read', chatController.markAsRead.bind(chatController));

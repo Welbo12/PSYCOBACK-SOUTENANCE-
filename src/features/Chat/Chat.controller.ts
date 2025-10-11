@@ -76,6 +76,37 @@ export class ChatController {
       });
     }
   }
+  
+  async sendMessage(req: Request, res: Response) {
+    try {
+      const { conversationId } = req.params;
+      const { text } = req.body;
+      const userId = (req as any).user.id;
+
+      if (!conversationId) {
+        return res.status(400).json({ message: 'conversationId requis' });
+      }
+
+      if (!text) {
+        return res.status(400).json({ message: 'text requis' });
+      }
+
+      const message = await this.service.sendMessage(conversationId, userId, text);
+      
+      res.status(201).json({
+        success: true,
+        data: message
+      });
+    } catch (error: any) {
+      console.error('Erreur lors de l\'envoi du message:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erreur serveur lors de l\'envoi du message',
+        error: error.message
+      });
+    }
+  }
+
 
   async markAsRead(req: Request, res: Response) {
     try {
